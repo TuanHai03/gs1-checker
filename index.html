@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Kiểm tra mã GS1 DataMatrix</title>
+<title>Kiểm tra mã vạch GS1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap&subset=vietnamese">
@@ -113,6 +113,16 @@ pre.zpl{margin:0;font-family:var(--mono);font-size:13px;background:var(--sunk);b
 footer{font-size:13px;color:var(--ink-3);display:grid;gap:4px;max-width:80ch}
 footer a{color:var(--accent)}
 .loading{opacity:.55}
+.result.noimg{grid-template-columns:1fr}
+.result.noimg .imgbox{display:none}
+.manual{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.manual summary{cursor:pointer;padding:12px 16px;font-weight:600}
+.manual .mbody{padding:0 16px 16px;display:grid;gap:10px}
+.manual p{margin:0;color:var(--ink-2);font-size:13.5px}
+.manual code{font-family:var(--mono);font-size:12.5px;background:var(--sunk);padding:0 4px;border-radius:3px}
+.manual textarea{width:100%;font-family:var(--mono);font-size:14px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--sunk);color:var(--ink);resize:vertical}
+.manual .actions{align-items:center}
+.kv td.k{font-family:var(--mono);font-weight:600;color:var(--accent);white-space:nowrap}
 .actions{display:flex;flex-wrap:wrap;gap:8px}
 .livenote{flex:1 1 100%;margin:0;font-size:13px;color:var(--ink-2);background:var(--sunk);border-radius:6px;padding:8px 10px}
 .livenote[hidden]{display:none}
@@ -159,8 +169,8 @@ footer a{color:var(--accent)}
 <div class="wrap">
   <header>
     <div>
-      <h1>Kiểm tra mã GS1 DataMatrix</h1>
-      <p class="sub"><span class="desk">Dán ảnh chụp mã vào trang</span><span class="touch">Quét hoặc chụp mã</span> để xem nội dung, cỡ mã và cú pháp GS1 (FNC1, AI, ký tự phân cách GS).</p>
+      <h1>Kiểm tra mã vạch &amp; mã 2D</h1>
+      <p class="sub"><span class="desk">Dán ảnh chụp mã vào trang</span><span class="touch">Quét hoặc chụp mã</span> để xem nội dung và kiểm tra theo chuẩn: GS1 (DataMatrix, QR, GS1-128, DataBar, Digital Link), EAN/UPC/ITF-14, VietQR/EMVCo, ISO/IEC 15434 (UDI, IFA/PPN), HIBC, URL, Wi-Fi, vCard…</p>
     </div>
     <div class="samples">
       <span>Ảnh mẫu</span>
@@ -186,6 +196,15 @@ footer a{color:var(--accent)}
     <div class="status" id="status">Đang tải bộ giải mã…</div>
   </div>
 
+  <details class="manual" id="manual">
+    <summary>Nhập hoặc dán dữ liệu đã quét (không cần ảnh)</summary>
+    <div class="mbody">
+      <p>Dùng khi có sẵn chuỗi từ máy quét cầm tay hoặc phần mềm. Nếu máy quét gửi mã nhận dạng AIM (vd. <code>]d2</code>, <code>]Q3</code>, <code>]C1</code>, <code>]E0</code>) ở đầu, trang tự biết loại mã. Ký tự phân cách GS có thể nhập là <code>&lt;GS&gt;</code>, <code>[GS]</code>, <code>{GS}</code>, <code></code> hoặc bấm <kbd>Ctrl</kbd>+<kbd>]</kbd>. FNC1 đầu mã: <code>[FNC1]</code>. Dạng HRI <code>(01)…(10)…</code> cũng được.</p>
+      <textarea id="mtext" rows="3" spellcheck="false" autocomplete="off" placeholder="]d201089345880122281726123110LOT123&lt;GS&gt;21SERIAL01"></textarea>
+      <div class="actions"><button class="btn primary" id="mgo" type="button">Kiểm tra dữ liệu</button><span class="status">Ctrl+Enter để kiểm tra</span></div>
+    </div>
+  </details>
+
   <div class="result" id="result" hidden>
     <div class="imgbox">
       <canvas id="cv"></canvas>
@@ -195,7 +214,7 @@ footer a{color:var(--accent)}
   </div>
 
   <footer>
-    <div>Trang này kiểm tra <b>dữ liệu và cú pháp</b>. Grade chất lượng in (ISO/IEC 15415) phải đo bằng máy verifier. Quy tắc AI nào phải đi kèm AI nào chỉ được kiểm tra một phần. Muốn kiểm tra đầy đủ, dùng <a href="https://www.gs1.org/standards/gs1-barcodes/gs1-barcode-syntax-resource" target="_blank" rel="noopener">GS1 Barcode Syntax Resource</a>.</div>
+    <div>Trang này kiểm tra <b>dữ liệu và cú pháp</b> của mọi loại mã zxing-cpp đọc được: QR, Micro QR, rMQR, Data Matrix, Aztec, PDF417, MaxiCode, DotCode, Code 128/39/93, Codabar, ITF, EAN-13/8, UPC-A/E, GS1 DataBar. Grade chất lượng in (ISO/IEC 15415) phải đo bằng máy verifier. Quy tắc AI nào phải đi kèm AI nào chỉ được kiểm tra một phần. Muốn kiểm tra đầy đủ, dùng <a href="https://www.gs1.org/standards/gs1-barcodes/gs1-barcode-syntax-resource" target="_blank" rel="noopener">GS1 Barcode Syntax Resource</a>.</div>
     <div>Bộ giải mã: zxing-cpp (zxing-wasm 3.1.4). Quét camera cần trang chạy qua HTTPS (hoặc mở file trực tiếp) và được cấp quyền camera; nếu trình duyệt chặn, dùng nút “Chụp ảnh”.</div>
   </footer>
 </div>
@@ -204,7 +223,7 @@ footer a{color:var(--accent)}
   <video id="vid" playsinline muted autoplay></video>
   <div class="guide" id="guide"></div>
   <div class="bar">
-    <span class="t">Quét mã DataMatrix</span>
+    <span class="t">Quét mã vạch / mã 2D</span>
     <button class="ic" id="scanClose" type="button" aria-label="Đóng"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
   <div class="bottom">
@@ -234,38 +253,41 @@ const $ = s => document.querySelector(s);
 const statusEl = $('#status');
 let ready = false, queue = null;
 
-/* ---------- GS1 AI dictionary (subset) ---------- */
-// spec: N=digits, X=CSET82, Y=CSET39, Z=CSET64. "N3+X..9" = 3 fixed digits then up to 9 chars.
+/* ======================================================================
+   GS1 Application Identifier dictionary
+   spec: N=digits, X=CSET82, Y=CSET39, Z=CSET64. "N3+X..9" = 3 fixed digits then up to 9 chars.
+   ====================================================================== */
 const AI = {};
 function def(keys, spec, name, flags){ for (const k of keys.split(' ')) AI[k] = {spec, name, ...(flags||{})}; }
+const NEEDS_GTIN = ['01','02','03','8006','8026'];
 def('00','N18','SSCC (mã đơn vị vận chuyển)',{cd:true});
-def('01','N14','GTIN (mã sản phẩm)',{cd:true});
-def('02','N14','GTIN hàng chứa bên trong',{cd:true});
-def('03','N14','GTIN hàng làm theo đơn',{cd:true});
-def('10','X..20','Số lô (Batch/Lot)',{needs:['01','02','03','8006','8026']});
-def('11','N6','Ngày sản xuất (YYMMDD)',{date:true,needs:['01','02','03','8006','8026']});
+def('01','N14','GTIN (mã sản phẩm)',{cd:true,gtin:true});
+def('02','N14','GTIN hàng chứa bên trong',{cd:true,gtin:true,needs:['00']});
+def('03','N14','GTIN hàng làm theo đơn',{cd:true,gtin:true});
+def('10','X..20','Số lô (Batch/Lot)',{needs:NEEDS_GTIN});
+def('11','N6','Ngày sản xuất (YYMMDD)',{date:true,needs:NEEDS_GTIN});
 def('12','N6','Ngày đến hạn thanh toán',{date:true});
-def('13','N6','Ngày đóng gói',{date:true,needs:['01','02','03','8006','8026']});
-def('15','N6','Sử dụng tốt nhất trước',{date:true,needs:['01','02','03','8006','8026']});
-def('16','N6','Hạn bán',{date:true,needs:['01','02','03','8006','8026']});
-def('17','N6','Hạn sử dụng (Expiry)',{date:true,needs:['01','02','03','8006','8026']});
-def('20','N2','Biến thể sản phẩm');
+def('13','N6','Ngày đóng gói',{date:true,needs:NEEDS_GTIN});
+def('15','N6','Sử dụng tốt nhất trước',{date:true,needs:NEEDS_GTIN});
+def('16','N6','Hạn bán',{date:true,needs:NEEDS_GTIN});
+def('17','N6','Hạn sử dụng (Expiry)',{date:true,needs:NEEDS_GTIN});
+def('20','N2','Biến thể sản phẩm',{needs:NEEDS_GTIN});
 def('21','X..20','Số serial',{needs:['01','03','8006']});
-def('22','X..20','Biến thể theo người dùng (CPV)');
-def('235','X..28','Serial phụ (TPX)');
-def('240','X..30','Mã nhận dạng bổ sung');
-def('241','X..30','Mã linh kiện của khách hàng');
-def('242','N..6','Biến thể hàng làm theo đơn');
-def('243','X..20','Mã bao bì (PCN)');
-def('250','X..30','Serial thứ cấp');
-def('251','X..30','Tham chiếu nguồn gốc');
+def('22','X..20','Biến thể theo người dùng (CPV)',{needs:['01']});
+def('235','X..28','Serial phụ (TPX)',{needs:['01']});
+def('240','X..30','Mã nhận dạng bổ sung',{needs:['01','02']});
+def('241','X..30','Mã linh kiện của khách hàng',{needs:['01','02']});
+def('242','N..6','Biến thể hàng làm theo đơn',{needs:['01','02']});
+def('243','X..20','Mã bao bì (PCN)',{needs:['01']});
+def('250','X..30','Serial thứ cấp',{needs:['01','8006']});
+def('251','X..30','Tham chiếu nguồn gốc',{needs:['01','8006']});
 def('253','N13+X..17','GDTI (mã chứng từ)',{cd13:true});
-def('254','X..20','Phần mở rộng GLN');
+def('254','X..20','Phần mở rộng GLN',{needs:['414']});
 def('255','N13+N..12','GCN (mã phiếu giảm giá)',{cd13:true});
-def('30','N..8','Số lượng thay đổi');
+def('30','N..8','Số lượng thay đổi',{needs:['01','02']});
 for (const p of ['310','311','312','313','314','315','316','320','321','322','323','324','325','326','327','328','329','330','331','332','333','334','335','336','337','340','341','342','343','344','345','346','347','348','349','350','351','352','353','354','355','356','357','360','361','362','363','364','365','366','367','368','369'])
-  def(p+'n','N6','Đo lường (khối lượng / kích thước / thể tích)');
-def('37','N..8','Số lượng đơn vị bên trong');
+  def(p+'n','N6','Đo lường (khối lượng / kích thước / thể tích)',{measure:true});
+def('37','N..8','Số lượng đơn vị bên trong',{needs:['02','8026']});
 def('390n','N..15','Số tiền phải trả (nội tệ)');
 def('391n','N3+N..15','Số tiền phải trả (kèm mã ISO tiền tệ)');
 def('392n','N..15','Giá (nội tệ)');
@@ -275,8 +297,14 @@ def('395n','N6','Giá trên đơn vị đo');
 def('400','X..30','Số đơn đặt hàng của khách');
 def('401','X..30','GINC (mã lô gửi hàng)');
 def('402','N17','GSIN (mã chuyến hàng)',{cd:true});
-def('403','X..30','Mã tuyến đường');
-def('410 411 412 413 414 415 416','N13','GLN (mã địa điểm)',{cd:true});
+def('403','X..30','Mã tuyến đường',{needs:['00']});
+def('410','N13','GLN nơi giao hàng',{cd:true});
+def('411','N13','GLN nơi nhận hóa đơn',{cd:true});
+def('412','N13','GLN nhà cung cấp',{cd:true});
+def('413','N13','GLN nơi giao cuối cùng',{cd:true});
+def('414','N13','GLN địa điểm vật lý',{cd:true});
+def('415','N13','GLN bên lập hóa đơn',{cd:true});
+def('416','N13','GLN nơi sản xuất / dịch vụ',{cd:true});
 def('417','N13','GLN của bên liên quan',{cd:true});
 def('420','X..20','Mã bưu chính nơi nhận');
 def('421','N3+X..9','Mã bưu chính nơi nhận (kèm mã quốc gia)');
@@ -286,9 +314,40 @@ def('424','N3','Quốc gia chế biến');
 def('425','N3+N..12','Quốc gia tháo dỡ');
 def('426','N3','Quốc gia chế biến toàn bộ');
 def('427','X..3','Mã vùng xuất xứ');
+def('4300','X..35','Tên công ty nhận hàng');
+def('4301','X..35','Tên người nhận hàng');
+def('4302','X..70','Địa chỉ nhận, dòng 1');
+def('4303','X..70','Địa chỉ nhận, dòng 2');
+def('4304','X..70','Phường/xã nơi nhận');
+def('4305','X..70','Thành phố nơi nhận');
+def('4306','X..70','Tỉnh/bang nơi nhận');
+def('4307','X2','Mã quốc gia nơi nhận (ISO alpha-2)');
+def('4308','X..30','Số điện thoại người nhận');
+def('4309','N20','Tọa độ nơi nhận');
+def('4310','X..35','Tên công ty nhận hàng hoàn');
+def('4311','X..35','Tên người nhận hàng hoàn');
+def('4312','X..70','Địa chỉ hoàn, dòng 1');
+def('4313','X..70','Địa chỉ hoàn, dòng 2');
+def('4314','X..70','Phường/xã nơi hoàn');
+def('4315','X..70','Thành phố nơi hoàn');
+def('4316','X..70','Tỉnh/bang nơi hoàn');
+def('4317','X2','Mã quốc gia nơi hoàn (ISO alpha-2)');
+def('4318','X..20','Mã bưu chính nơi hoàn');
+def('4319','X..30','Số điện thoại nơi hoàn');
+def('4320','X..35','Mô tả dịch vụ vận chuyển');
+def('4321','N1','Hàng nguy hiểm (0/1)',{bool:true});
+def('4322','N1','Cho phép để hàng không cần người nhận (0/1)',{bool:true});
+def('4323','N1','Yêu cầu ký nhận (0/1)',{bool:true});
+def('4324','N10','Giao không sớm hơn (YYMMDDHHMM)',{dt10:true});
+def('4325','N10','Giao không muộn hơn (YYMMDDHHMM)',{dt10:true});
+def('4326','N6','Ngày phát hành',{date:true});
+def('4330','N6+X0..1','Nhiệt độ tối đa (°F)',{temp:true});
+def('4331','N6+X0..1','Nhiệt độ tối đa (°C)',{temp:true});
+def('4332','N6+X0..1','Nhiệt độ tối thiểu (°F)',{temp:true});
+def('4333','N6+X0..1','Nhiệt độ tối thiểu (°C)',{temp:true});
 def('7001','N13','Mã NATO (NSN)');
-def('7002','X..30','Phân loại thịt');
-def('7003','N10','Thời điểm hết hạn (YYMMDDHHMM)');
+def('7002','X..30','Phân loại thịt (UNECE)');
+def('7003','N10','Thời điểm hết hạn (YYMMDDHHMM)',{dt10:true});
 def('7004','N..4','Hoạt lực');
 def('7005','X..12','Khu vực đánh bắt');
 def('7006','N6','Ngày cấp đông lần đầu',{date:true});
@@ -303,11 +362,22 @@ def('7022','X..20','Trạng thái phiên bản (Revision)');
 def('7023','X..30','GIAI của cụm lắp ráp');
 for (let i=0;i<10;i++) def('703'+i,'N3+X..27','Đơn vị chế biến (kèm mã quốc gia)');
 def('7040','N1+X3','Mã UIC kèm phần mở rộng');
+def('7041','X..4','Loại đơn vị đóng gói (UFRGT)');
 def('710 711 712 713 714 715 716','X..20','Mã quốc gia về sản phẩm y tế (NHRN)');
 for (let i=0;i<10;i++) def('723'+i,'X2+X..28','Tham chiếu chứng nhận');
 def('7240','X..20','Mã giao thức');
 def('7241','N2','Loại phương tiện AIDC');
 def('7242','X..25','Mã kiểm soát phiên bản (VCN)');
+def('7250','N8','Ngày sinh (YYYYMMDD)',{date8:true});
+def('7251','N12','Ngày giờ sinh (YYYYMMDDHHMM)');
+def('7252','N1','Giới tính sinh học');
+def('7253','X..40','Họ của bệnh nhân');
+def('7254','X..40','Tên của bệnh nhân');
+def('7255','X..10','Hậu tố tên bệnh nhân');
+def('7256','X..90','Họ tên đầy đủ của bệnh nhân');
+def('7257','X..70','Địa chỉ bệnh nhân');
+def('7258','N1+X1+N1','Thứ tự sinh (đa thai)');
+def('7259','X..40','Họ của trẻ sơ sinh');
 def('8001','N14','Sản phẩm dạng cuộn');
 def('8002','X..20','Mã số điện thoại di động');
 def('8003','N14+X..16','GRAI (tài sản quay vòng)',{cd13from1:true});
@@ -321,7 +391,8 @@ def('8010','Y..30','CPID (mã linh kiện / bộ phận)');
 def('8011','N..12','Serial của CPID',{needs:['8010']});
 def('8012','X..20','Phiên bản phần mềm');
 def('8013','X..25','GMN (mã mẫu sản phẩm)');
-def('8017 8018','N18','GSRN',{cd:true});
+def('8014','X..25','MUDI (mã thiết bị y tế cấp cao)');
+def('8017 8018','N18','GSRN (mã quan hệ dịch vụ)',{cd:true});
 def('8019','N..10','SRIN');
 def('8020','X..25','Số tham chiếu thanh toán');
 def('8026','N14+N2+N2','ITIP của hàng chứa bên trong',{cd14:true});
@@ -336,6 +407,7 @@ def('91 92 93 94 95 96 97 98 99','X..90','Thông tin nội bộ công ty');
 // Prefixes with predefined length: no GS separator needed after them.
 const PREDEF = new Set(['00','01','02','03','04','11','12','13','14','15','16','17','18','19','20','31','32','33','34','35','36','41']);
 
+function aiDef(code){ return AI[code] || (code.length===4 && AI[code.slice(0,3)+'n']) || null; }
 function lookupAI(s, pos){
   for (let L=2; L<=4; L++){
     const code = s.substr(pos, L);
@@ -349,7 +421,7 @@ function lookupAI(s, pos){
 function parseSpec(spec){
   return spec.split('+').map(p => { const m = p.match(/^([NXYZ])(\d+)?(?:\.\.(\d+))?$/); return m[2] && m[3] ? {cs:m[1],min:+m[2],max:+m[3]} : m[3] ? {cs:m[1],min:1,max:+m[3]} : {cs:m[1],min:+m[2],max:+m[2]}; });
 }
-function specBounds(segs){ return {min:segs.reduce((a,s)=>a+(s===segs[segs.length-1]?s.min:s.max),0), max:segs.reduce((a,s)=>a+s.max,0), fixed:segs.every(s=>s.min===s.max)}; }
+function specBounds(segs){ return {min:segs.reduce((a,s,i)=>a+(i===segs.length-1?s.min:s.max),0), max:segs.reduce((a,s)=>a+s.max,0), fixed:segs.every(s=>s.min===s.max)}; }
 const CS = {
   N:/^[0-9]*$/,
   X:/^[!"%&'()*+,\-./0-9:;<=>?A-Z_a-z]*$/,
@@ -357,15 +429,49 @@ const CS = {
   Z:/^[\-0-9A-Z_a-z=]*$/
 };
 const CSNAME = {N:'chỉ chữ số', X:'bộ ký tự GS1 CSET 82', Y:'CSET 39: chỉ 0-9, A-Z in hoa, # - /', Z:'CSET 64'};
-function mod10ok(d){ let sum=0; const n=d.length; for (let i=0;i<n-1;i++){ sum += (+d[i]) * (((n-1-i)%2===1)?3:1); } return (10 - sum%10)%10 === +d[n-1]; }
+function mod10ok(d){ if (!/^\d+$/.test(d)) return false; return mod10(d.slice(0,-1)) === +d[d.length-1]; }
+function mod10(body){ let sum=0; const n=body.length; for (let i=0;i<n;i++){ sum += (+body[i]) * (((n-1-i)%2===0)?3:1); } return (10 - sum%10)%10; }
 function dateOk(v){ const mm=+v.substr(2,2), dd=+v.substr(4,2); if (mm<1||mm>12) return false; if (dd===0) return true; const yy=+v.substr(0,2); const dim=new Date(2000+yy, mm, 0).getDate(); return dd<=dim; }
+function date8Ok(v){ const y=+v.substr(0,4), m=+v.substr(4,2), d=+v.substr(6,2); return m>=1&&m<=12&&d>=1&&d<=new Date(y,m,0).getDate(); }
+function dt10Ok(v){ return dateOk(v.slice(0,6)) && +v.substr(6,2)<=23 && +v.substr(8,2)<=59; }
+function fmtDate6(v){ const dd=v.substr(4,2); return `${dd==='00'?'cuối tháng':dd}/${v.substr(2,2)}/20${v.substr(0,2)}`; }
+
+/* ---------- GS1 company prefix → GS1 member organisation ---------- */
+const PREFIX_TBL = ('000-019:Mỹ & Canada|020-029:Mã nội bộ (phân phối hạn chế)|030-039:Mỹ (dược phẩm)|040-049:Mã nội bộ (phân phối hạn chế)|050-059:Phiếu giảm giá|060-139:Mỹ & Canada|'+
+ '200-299:Mã nội bộ / hàng cân đo (phân phối hạn chế)|300-379:Pháp|380:Bulgaria|383:Slovenia|385:Croatia|387:Bosnia & Herzegovina|389:Montenegro|400-440:Đức|450-459:Nhật Bản|460-469:Nga|470:Kyrgyzstan|471:Đài Loan|474:Estonia|475:Latvia|476:Azerbaijan|477:Litva|478:Uzbekistan|479:Sri Lanka|480:Philippines|481:Belarus|482:Ukraina|483:Turkmenistan|484:Moldova|485:Armenia|486:Georgia|487:Kazakhstan|488:Tajikistan|489:Hồng Kông|490-499:Nhật Bản|'+
+ '500-509:Anh|520-521:Hy Lạp|528:Liban|529:Síp|530:Albania|531:Bắc Macedonia|535:Malta|539:Ireland|540-549:Bỉ & Luxembourg|560:Bồ Đào Nha|569:Iceland|570-579:Đan Mạch|590:Ba Lan|594:Romania|599:Hungary|600-601:Nam Phi|603:Ghana|604:Senegal|608:Bahrain|609:Mauritius|611:Maroc|613:Algeria|615:Nigeria|616:Kenya|618:Bờ Biển Ngà|619:Tunisia|620:Tanzania|621:Syria|622:Ai Cập|623:Brunei|624:Libya|625:Jordan|626:Iran|627:Kuwait|628:Ả Rập Xê Út|629:UAE|640-649:Phần Lan|690-699:Trung Quốc|'+
+ '700-709:Na Uy|729:Israel|730-739:Thụy Điển|740:Guatemala|741:El Salvador|742:Honduras|743:Nicaragua|744:Costa Rica|745:Panama|746:Cộng hòa Dominica|750:Mexico|754-755:Canada|759:Venezuela|760-769:Thụy Sĩ|770-771:Colombia|773:Uruguay|775:Peru|777:Bolivia|778-779:Argentina|780:Chile|784:Paraguay|786:Ecuador|789-790:Brazil|'+
+ '800-839:Ý|840-849:Tây Ban Nha|850:Cuba|858:Slovakia|859:Séc|860:Serbia|865:Mông Cổ|867:Triều Tiên|868-869:Thổ Nhĩ Kỳ|870-879:Hà Lan|880:Hàn Quốc|883:Myanmar|884:Campuchia|885:Thái Lan|888:Singapore|890:Ấn Độ|893:Việt Nam|896:Pakistan|899:Indonesia|'+
+ '900-919:Áo|930-939:Úc|940-949:New Zealand|950:GS1 Global Office|951:GS1 Global Office (EPC)|955:Malaysia|958:Ma Cao|960-969:GS1 Anh (GTIN-8)|977:ISSN (ấn phẩm định kỳ)|978-979:ISBN (sách) / ISMN (979-0)|980:Phiếu hoàn tiền|981-984:Phiếu giảm giá|990-999:Phiếu giảm giá')
+ .split('|').map(x=>{ const [r,name]=x.split(':'); const [a,b]=r.split('-'); return {a:+a,b:+(b||a),name}; });
+function prefixName(gtin){
+  // gtin: 8, 12, 13 or 14 digits (with check digit)
+  let g13 = gtin.length===14 ? gtin.slice(1) : gtin.length===12 ? '0'+gtin : gtin;
+  if (gtin.length===14 && gtin.startsWith('00000')) g13 = gtin.slice(1); // GTIN-8 inside
+  const p = +g13.slice(0,3);
+  const hit = PREFIX_TBL.find(r=>p>=r.a && p<=r.b);
+  return hit ? {p:g13.slice(0,3), name:hit.name} : {p:g13.slice(0,3), name:'không có trong bảng (chưa cấp hoặc dự phòng)'};
+}
+function gtinNotes(g){
+  const out=[];
+  if (g.length===14){
+    const ind=g[0];
+    if (g.startsWith('000000')) out.push(`Chứa GTIN-8 ${g.slice(6)}.`);
+    else if (g.startsWith('00')) out.push(`Chứa GTIN-12 (UPC-A) ${g.slice(2)}.`);
+    else if (ind==='0') out.push(`Chứa GTIN-13 ${g.slice(1)} (đơn vị bán lẻ cơ bản).`);
+    else if (ind==='9') out.push('Số chỉ thị 9: hàng có khối lượng/số lượng thay đổi.');
+    else out.push(`Số chỉ thị ${ind}: thường là mã của thùng/kiện (cấp đóng gói).`);
+  }
+  if (!g.startsWith('000000')){ const pf=prefixName(g); out.push(`Tiền tố ${pf.p}: ${pf.name}. Đây là nơi đăng ký mã, không phải xuất xứ hàng.`); }
+  return out;
+}
 
 function parseGS1(s){
   const fields=[], issues=[];
   let pos=0;
   if (s[0]==='\x1d'){ issues.push({lvl:'warn',t:'Có ký tự GS ngay đầu dữ liệu (sau FNC1). Ký tự này thừa.'}); pos=1; }
   while (pos < s.length){
-    if (s[pos]==='\x1d'){ issues.push({lvl:'warn',t:`Hai ký tự GS liền nhau ở vị trí ${pos}.`}); pos++; continue; }
+    if (s[pos]==='\x1d'){ issues.push({lvl:'warn',t:`Hai ký tự GS liền nhau hoặc GS ở cuối, vị trí ${pos}.`}); pos++; continue; }
     const ai = lookupAI(s,pos);
     if (!ai){
       issues.push({lvl:'bad',t:`Không nhận ra AI tại vị trí ${pos}: “${vis(s.substr(pos,6))}…”. Có thể thiếu ký tự GS phân cách trước đó, hoặc AI không có trong danh mục GS1.`});
@@ -401,20 +507,40 @@ function parseGS1(s){
       if (!CS[sg.cs].test(part)){ f.st='bad'; f.notes.push(`Có ký tự không hợp lệ (${CSNAME[sg.cs]}): “${vis(part)}”.`); }
     });
     if (f.st!=='bad'){
-      if (ai.cd && /^\d+$/.test(value) && !mod10ok(value)){ f.st='bad'; f.notes.push('Sai số kiểm tra (check digit).'); }
+      if (ai.cd && !mod10ok(value)){ f.st='bad'; f.notes.push(`Sai số kiểm tra (check digit): số cuối phải là ${mod10(value.slice(0,-1))}.`); }
       if (ai.cd13 && !mod10ok(value.slice(0,13))){ f.st='bad'; f.notes.push('Sai số kiểm tra của 13 số đầu.'); }
       if (ai.cd14 && !mod10ok(value.slice(0,14))){ f.st='bad'; f.notes.push('Sai số kiểm tra của GTIN 14 số đầu.'); }
       if (ai.cd13from1 && !mod10ok(value.slice(1,14))){ f.st='bad'; f.notes.push('Sai số kiểm tra của GRAI.'); }
-      if (ai.date && !dateOk(value)){ f.st='bad'; f.notes.push('Ngày không hợp lệ (định dạng YYMMDD).'); }
+      if (ai.date){ if (!dateOk(value)){ f.st='bad'; f.notes.push('Ngày không hợp lệ (định dạng YYMMDD).'); } else f.notes.push(`= ${fmtDate6(value)}`); }
+      if (ai.date8 && !date8Ok(value)){ f.st='bad'; f.notes.push('Ngày không hợp lệ (định dạng YYYYMMDD).'); }
+      if (ai.dt10 && !dt10Ok(value)){ f.st='bad'; f.notes.push('Ngày giờ không hợp lệ (YYMMDDHHMM).'); }
+      if (ai.bool && !/^[01]$/.test(value)){ f.st='bad'; f.notes.push('Chỉ được là 0 hoặc 1.'); }
+      if (ai.temp && !/^\d{6}-?$/.test(value)){ f.st='bad'; f.notes.push('Ký tự thứ 7 (nếu có) chỉ được là dấu “-”.'); }
+      if (ai.gtin && f.st==='ok') f.notes.push(...gtinNotes(value));
+      if (ai.measure && f.st==='ok'){ const dp=+ai.code[3]; f.notes.push(`= ${(+value/Math.pow(10,dp)).toLocaleString('vi-VN',{maximumFractionDigits:dp})} (${dp} chữ số thập phân)`); }
     }
     if (ai.code==='8010' && f.st==='ok') f.notes.push('Chỉ cho phép 0-9, A-Z in hoa, # - /.');
     f.value = value; fields.push(f); pos = end;
   }
   // duplicates & associations
   const codes = fields.map(f=>f.ai);
-  codes.forEach((c,i)=>{ if (c!=='?' && codes.indexOf(c)!==i) issues.push({lvl:'bad',t:`AI (${c}) xuất hiện nhiều lần.`}); });
-  fields.forEach(f=>{ const d = AI[f.ai] || AI[f.ai.slice(0,-1)+'n']; if (d && d.needs && !d.needs.some(n=>codes.includes(n))) issues.push({lvl:'warn',t:`AI (${f.ai}) thường phải đi kèm ${d.needs.map(n=>'('+n+')').join(' hoặc ')}.`}); });
+  codes.forEach((c,i)=>{
+    if (c==='?' || codes.indexOf(c)===i) return;
+    const a = fields[codes.indexOf(c)].value, b = fields[i].value;
+    issues.push({lvl:'bad',t:`AI (${c}) xuất hiện nhiều lần${a===b?' (cùng giá trị)':' với giá trị khác nhau'}.`});
+  });
+  fields.forEach(f=>{ const d = aiDef(f.ai); if (d && d.needs && !d.needs.some(n=>codes.includes(n))) issues.push({lvl:'warn',t:`AI (${f.ai}) thường phải đi kèm ${d.needs.map(n=>'('+n+')').join(' hoặc ')}.`}); });
+  if (codes.includes('01') && codes.includes('02')) issues.push({lvl:'bad',t:'Không được dùng (01) và (02) cùng lúc.'});
+  if (codes.includes('17') && codes.includes('7003')) issues.push({lvl:'warn',t:'Có cả (17) và (7003). Chỉ nên dùng một kiểu hạn dùng.'});
   return {fields, issues};
+}
+function gs1Verdict(parsed){
+  const bad = parsed.fields.some(f=>f.st==='bad') || parsed.issues.some(x=>x.lvl==='bad');
+  const warn = parsed.issues.some(x=>x.lvl==='warn');
+  return bad?'bad':warn?'warn':'ok';
+}
+function elementString(pairs){
+  return pairs.map((p,i)=> p[0]+p[1] + (i<pairs.length-1 && !PREDEF.has(p[0].slice(0,2)) ? '\x1d':'')).join('');
 }
 
 function toGS1FromZplEscape(t){
@@ -425,12 +551,12 @@ function toGS1FromZplEscape(t){
   s = s.split(e+'d029').join('\x1d').split(e+'1').join('\x1d').split(e+'d095').join('_');
   return {s, esc:e};
 }
+const MARK_RE = /\[(FNC1|GS)\]|<(FNC1|GS)>|\{(FNC1|GS)\}/gi;
 function toGS1FromMarkers(t){
   // Detect literal markers such as [FNC1] / [GS] / <GS> / {GS} typed into the data
-  const re = /\[(FNC1|GS)\]|<(FNC1|GS)>|\{(FNC1|GS)\}/gi;
-  if (!re.test(t)) return null;
+  if (!new RegExp(MARK_RE.source,'i').test(t)) return null;
   let s = t.replace(/^(\[FNC1\]|<FNC1>|\{FNC1\})/i,'');
-  s = s.replace(/\[(FNC1|GS)\]|<(FNC1|GS)>|\{(FNC1|GS)\}/gi,'\x1d');
+  s = s.replace(MARK_RE,'\x1d');
   s = s.replace(/[\[\]]/g,'');
   return s;
 }
@@ -438,7 +564,7 @@ function toGS1FromHRI(t){
   if (!/^\(\d{2,4}\)/.test(t)) return null;
   const parts = [...t.matchAll(/\((\d{2,4})\)([^()]*)/g)];
   if (!parts.length) return null;
-  return parts.map((m,i)=> m[1]+m[2] + (i<parts.length-1 && !PREDEF.has(m[1].slice(0,2)) ? '\x1d':'')).join('');
+  return elementString(parts.map(m=>[m[1],m[2].replace(/\x1d/g,'')]));
 }
 
 function hriOf(fields){ return fields.filter(f=>f.ai!=='?').map(f=>`<b>(${f.ai})</b>${esc(f.value)}`).join(''); }
@@ -449,9 +575,331 @@ function zplOf(fields){
   ok.forEach((f,i)=>{ d += f.ai + f.value.replace(/_/g,'_d095'); if (i<ok.length-1 && !PREDEF.has(f.ai.slice(0,2))) d += '_d029'; });
   return `^XA\n^FO10,10\n^BXN,3,200,,,,_\n^FD${d}^FS\n^XZ`;
 }
+const DL_KEYS = ['01','00','253','255','401','402','414','417','8003','8004','8006','8010','8013','8017','8018'];
+function digitalLinkOf(fields){
+  const ok = fields.filter(f=>f.ai!=='?');
+  const key = ok.find(f=>DL_KEYS.includes(f.ai)); if (!key) return null;
+  const order = {'01':['22','10','21','235'],'414':['254','7040'],'8006':['22','10','21'],'8010':['8011'],'8017':['8019'],'8018':['8019'],'00':[],'8003':[],'8004':[],'253':[],'255':[],'401':[],'402':[],'417':['7040'],'8013':[]}[key.ai]||[];
+  const enc = v => encodeURIComponent(v).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase());
+  let path = `/${key.ai}/${enc(key.value)}`;
+  for (const q of order){ const f=ok.find(x=>x.ai===q); if (f) path += `/${q}/${enc(f.value)}`; }
+  const rest = ok.filter(f=>f!==key && !order.includes(f.ai));
+  const qs = rest.map(f=>`${f.ai}=${enc(f.value)}`).join('&');
+  return 'https://id.gs1.org' + path + (qs?'?'+qs:'');
+}
 
-/* ---------- symbol size ---------- */
-function sizeInfo(ver){
+/* ======================================================================
+   GS1 Digital Link (URI in QR / DataMatrix)
+   ====================================================================== */
+const DL_ALPHA = {gtin:'01',itip:'8006',cpv:'22',lot:'10',ser:'21',sscc:'00',gln:'414',party:'417',gsrnp:'8017',gsrn:'8018',gcn:'255',gdti:'253',ginc:'401',gsin:'402',grai:'8003',giai:'8004',cpid:'8010',cpsn:'8011',glnx:'254',refno:'8020',srin:'8019',tpx:'235',gmn:'8013',exp:'17',bbd:'15'};
+function parseDigitalLink(t){
+  if (!/^https?:\/\//i.test(t)) return null;
+  let u; try { u = new URL(t); } catch { return null; }
+  const dec = x => { try { return decodeURIComponent(x); } catch { return x; } };
+  const segs = u.pathname.split('/').filter(Boolean).map(dec);
+  let start=-1;
+  for (let i=0;i<segs.length-1;i++){
+    const k = DL_ALPHA[segs[i]] || segs[i];
+    if (DL_KEYS.includes(k) && (segs.length-i)%2===0){ start=i; break; }
+  }
+  if (start<0) return null;
+  const pairs=[], issues=[], extra=[];
+  for (let i=start;i<segs.length;i+=2){
+    const raw=segs[i]; const k = DL_ALPHA[raw] || raw;
+    if (!aiDef(k)) return null;
+    if (DL_ALPHA[raw]) issues.push({lvl:'warn',t:`Dùng khóa chữ “${raw}” (kiểu cũ). Chuẩn Digital Link 1.2+ khuyến nghị dùng số AI (${k}).`});
+    pairs.push([k, segs[i+1]]);
+  }
+  for (const [qk,qv] of u.searchParams){
+    const k = DL_ALPHA[qk] || qk;
+    if (/^\d{2,4}$/.test(k) && aiDef(k)) pairs.push([k,qv]);
+    else extra.push([qk,qv]);
+  }
+  // pad GTIN-8/12/13 to 14
+  pairs.forEach(p=>{ if (p[0]==='01' && /^\d{8}$|^\d{12,13}$/.test(p[1])){ issues.push({lvl:'warn',t:`GTIN trong URL có ${p[1].length} số. Digital Link chấp nhận, nhưng nên ghi đủ 14 số (thêm số 0 ở đầu).`}); p[1]=p[1].padStart(14,'0'); } });
+  // qualifier order for GTIN
+  const pk = pairs[0][0];
+  if (pk==='01'){
+    const ql = pairs.slice(1, segs.length-start>2 ? (segs.length-start)/2 : 1).map(p=>p[0]);
+    const want = ['22','10','21'].filter(q=>ql.includes(q));
+    if (ql.join()!==want.join()) issues.push({lvl:'bad',t:`Thứ tự phần định danh trên đường dẫn sai: phải là /01/…${want.map(q=>'/'+q+'/…').join('')}.`});
+    if (ql.some(q=>!['22','10','21'].includes(q))) issues.push({lvl:'bad',t:'Sau /01/ chỉ được có /22/, /10/, /21/ trên đường dẫn. Các AI khác phải đưa vào phần ?query.'});
+  }
+  if (u.protocol==='http:') issues.push({lvl:'warn',t:'Dùng http:// thay vì https://.'});
+  const host = u.host.toLowerCase();
+  issues.unshift({lvl: host==='id.gs1.org'?'ok':'ok', t: host==='id.gs1.org' ? 'Tên miền id.gs1.org: bộ phân giải chính thức của GS1.' : `Tên miền ${u.host}: tên miền riêng của doanh nghiệp (hợp lệ theo Digital Link).`});
+  return {pairs, issues, extra, host:u.host, es: elementString(pairs)};
+}
+
+/* ======================================================================
+   EAN / UPC / ITF-14 / GTIN
+   ====================================================================== */
+function upceToUpca(d){
+  if (!/^[01]\d{7}$/.test(d)) return null;
+  const ns=d[0], m=d.slice(1,7), cd=d[7], l=m[5];
+  let x;
+  if ('012'.includes(l)) x = m[0]+m[1]+l+'0000'+m[2]+m[3]+m[4];
+  else if (l==='3') x = m[0]+m[1]+m[2]+'00000'+m[3]+m[4];
+  else if (l==='4') x = m[0]+m[1]+m[2]+m[3]+'00000'+m[4];
+  else x = m.slice(0,5)+'0000'+l;
+  return ns+x+cd;
+}
+function analyzeRetail(fk, text, out){
+  const t = text.replace(/\s/g,'');
+  const name = {ean13:'EAN-13',ean8:'EAN-8',upca:'UPC-A',upce:'UPC-E',itf:'ITF',gtin:'GTIN'}[fk];
+  if (!/^\d+$/.test(t)){ out.cls='bad'; out.pill='Lỗi dữ liệu'; out.head=`${name}: có ký tự không phải số`; out.issues.push({lvl:'bad',t:'Mã EAN/UPC/ITF chỉ chứa chữ số.'}); return; }
+  let gtin=null, cdOk=null, label=name, len=t.length;
+  if (fk==='upce'){
+    const a = upceToUpca(t.length===8?t:t.length===7?'0'+t:t);
+    if (!a){ out.issues.push({lvl:'bad',t:'UPC-E phải có 8 số và bắt đầu bằng 0 hoặc 1.'}); cdOk=false; }
+    else { gtin=a; cdOk=mod10ok(a); out.issues.push({lvl:'ok',t:`UPC-E mở rộng thành UPC-A ${a}.`}); }
+  } else if (fk==='itf'){
+    if (len===14){ label='ITF-14'; gtin=t; cdOk=mod10ok(t); }
+    else if (len%2) out.issues.push({lvl:'bad',t:'ITF luôn có số chữ số chẵn.'});
+    else { out.cls='info'; out.pill='ITF'; out.head=`ITF ${len} số (không phải ITF-14)`; out.issues.push({lvl:'warn',t:'Không phải 14 số nên không mang GTIN. Hợp lệ nếu chỉ dùng nội bộ.'}); return; }
+  } else {
+    const need = {ean13:13,ean8:8,upca:12,gtin:len}[fk];
+    if (len!==need || ![8,12,13,14].includes(len)){ out.cls='bad'; out.pill='Lỗi dữ liệu'; out.head=`${name}: sai độ dài (${len} số)`; out.issues.push({lvl:'bad',t:`${name} phải có ${need||'8, 12, 13 hoặc 14'} chữ số.`}); return; }
+    gtin=t; cdOk=mod10ok(t);
+    if (fk==='gtin') label = 'GTIN-'+len;
+  }
+  if (!gtin){ out.cls='bad'; out.pill='Lỗi dữ liệu'; out.head=`${label} không hợp lệ`; return; }
+  out.cls = cdOk ? 'ok' : 'bad'; out.pill = cdOk ? 'Đạt' : 'Sai số kiểm tra';
+  const g14 = gtin.padStart(14,'0');
+  out.head = cdOk ? `${label} hợp lệ · GTIN-${gtin.length} ${gtin}` : `${label}: sai số kiểm tra`;
+  out.issues.push(cdOk ? {lvl:'ok',t:`Số kiểm tra (check digit) đúng: ${gtin.slice(-1)}.`} : {lvl:'bad',t:`Sai số kiểm tra: số cuối là ${gtin.slice(-1)}, đúng phải là ${mod10(gtin.slice(0,-1))}. Mã có thể bị in/nhập sai.`});
+  const g13 = gtin.length===13 ? gtin : null;
+  if (g13 && /^97[89]/.test(g13)){
+    if (/^9790/.test(g13)) out.issues.push({lvl:'ok',t:'Tiền tố 979-0: ISMN (bản nhạc in).'});
+    else { const b = g13.slice(3,12); let s=0; for (let i=0;i<9;i++) s+=(+b[i])*(10-i); const c=(11-s%11)%11; out.issues.push({lvl:'ok',t:`Đây là mã ISBN (sách): ISBN-13 ${g13}${g13.startsWith('978')?`, ISBN-10 tương ứng ${b}${c===10?'X':c}`:''}.`}); }
+  } else if (g13 && g13.startsWith('977')) out.issues.push({lvl:'ok',t:`Đây là mã ISSN (ấn phẩm định kỳ): ISSN ${g13.slice(3,10)}.`});
+  else if (/^2/.test(g13||'') || (gtin.length===8 && /^[02]/.test(gtin))) out.issues.push({lvl:'warn',t:'Tiền tố dành cho mã nội bộ / hàng cân đo (phân phối hạn chế). Chỉ dùng trong cửa hàng/doanh nghiệp, không dùng được trên thị trường chung.'});
+  else gtinNotes(g14).forEach(n=>out.issues.push({lvl:'ok',t:n}));
+  if (cdOk) out.gs1es = '01'+g14;
+}
+
+/* ======================================================================
+   EMVCo merchant-presented QR (VietQR / NAPAS 247 …)
+   ====================================================================== */
+const BANKS = {'970436':'Vietcombank','970415':'VietinBank','970418':'BIDV','970405':'Agribank','970407':'Techcombank','970422':'MB Bank','970416':'ACB','970432':'VPBank','970423':'TPBank','970403':'Sacombank','970441':'VIB','970443':'SHB','970437':'HDBank','970448':'OCB','970426':'MSB','970440':'SeABank','970431':'Eximbank','970449':'LPBank','970428':'Nam A Bank','970409':'Bac A Bank','970425':'ABBANK','970412':'PVcomBank','970429':'SCB','970452':'KienlongBank','970438':'BaoViet Bank','970427':'VietABank','970400':'Saigonbank','970406':'DongA Bank','970419':'NCB','970430':'PGBank','970433':'Vietbank','970454':'BVBank (Viet Capital)','970408':'GPBank','970414':'OceanBank','970424':'Shinhan Bank','970457':'Woori Bank','970458':'UOB','970439':'Public Bank','970442':'Hong Leong Bank','970434':'Indovina Bank','970421':'VRB','970444':'CBBank','970455':'IBK','970446':'Co-opBank','422589':'CIMB','546034':'CAKE by VPBank','546035':'Ubank by VPBank','963388':'Timo'};
+const EMV_TAGS = {'00':'Phiên bản định dạng','01':'Kiểu mã (11 tĩnh / 12 động)','52':'Mã ngành (MCC)','53':'Loại tiền','54':'Số tiền','55':'Chỉ báo tip/phí','56':'Phí cố định','57':'Phí %','58':'Quốc gia','59':'Tên đơn vị nhận','60':'Thành phố','61':'Mã bưu chính','62':'Thông tin bổ sung','63':'CRC','64':'Ngôn ngữ thay thế'};
+const EMV62 = {'01':'Số hóa đơn','02':'Số điện thoại','03':'Mã cửa hàng','04':'Mã khách hàng thân thiết','05':'Mã tham chiếu','06':'Mã khách hàng','07':'Mã thiết bị','08':'Nội dung chuyển khoản','09':'Yêu cầu thêm thông tin'};
+const CUR = {'704':'VND','840':'USD','978':'EUR','764':'THB','702':'SGD','458':'MYR','360':'IDR','608':'PHP','156':'CNY','392':'JPY','410':'KRW','418':'LAK','116':'KHR'};
+function parseTLV(s){
+  const out=[]; let i=0;
+  while (i<s.length){
+    const id=s.substr(i,2), ln=s.substr(i+2,2);
+    if (!/^\d{2}$/.test(id) || !/^\d{2}$/.test(ln)) return {ok:false, out, err:`Cấu trúc TLV hỏng ở vị trí ${i}.`};
+    const v = s.substr(i+4, +ln);
+    if (v.length < +ln) return {ok:false, out, err:`Trường ${id} khai báo dài ${+ln} nhưng chỉ còn ${v.length} ký tự.`};
+    out.push({id, v, pos:i}); i += 4 + +ln;
+  }
+  return {ok:true, out};
+}
+function crc16(s){
+  let crc=0xFFFF;
+  for (const b of new TextEncoder().encode(s)){ crc ^= b<<8; for (let k=0;k<8;k++) crc = (crc&0x8000) ? ((crc<<1)^0x1021)&0xFFFF : (crc<<1)&0xFFFF; }
+  return crc.toString(16).toUpperCase().padStart(4,'0');
+}
+function analyzeEMV(t, out){
+  const tlv = parseTLV(t);
+  const rows=[]; let vietqr=null, bad=false;
+  if (!tlv.ok){ out.issues.push({lvl:'bad',t:tlv.err}); bad=true; }
+  const tags = tlv.out;
+  const get = id => tags.find(x=>x.id===id);
+  if (!tags.length || tags[0].id!=='00' || tags[0].v!=='01'){ out.issues.push({lvl:'bad',t:'Trường đầu tiên phải là 00 = “01”.'}); bad=true; }
+  const last = tags[tags.length-1];
+  if (!last || last.id!=='63' || last.v.length!==4){ out.issues.push({lvl:'bad',t:'Thiếu trường CRC (63) 4 ký tự ở cuối.'}); bad=true; }
+  else {
+    const calc = crc16(t.slice(0, last.pos+4));
+    if (calc===last.v.toUpperCase()) out.issues.push({lvl:'ok',t:`CRC đúng (${last.v}).`});
+    else { out.issues.push({lvl:'bad',t:`Sai CRC: mã ghi ${last.v}, tính ra ${calc}. Ứng dụng ngân hàng sẽ từ chối mã này (dữ liệu bị sửa hoặc tạo sai).`}); bad=true; }
+  }
+  for (const x of tags){
+    const id=+x.id; let name = EMV_TAGS[x.id] || '', val = esc(x.v), note='';
+    if (id>=2 && id<=51){
+      name = id<=25 ? 'Tài khoản thẻ quốc tế' : 'Thông tin tài khoản nhận';
+      const sub = parseTLV(x.v);
+      if (sub.ok && sub.out.length){
+        const gid = sub.out.find(s=>s.id==='00');
+        if (gid && gid.v==='A000000727'){
+          name='VietQR (NAPAS)';
+          const ben = sub.out.find(s=>s.id==='01'); const svc = sub.out.find(s=>s.id==='02');
+          const bs = ben ? parseTLV(ben.v).out : [];
+          const bin = (bs.find(s=>s.id==='00')||{}).v, acc = (bs.find(s=>s.id==='01')||{}).v;
+          vietqr = {bin, acc, bank: BANKS[bin] || 'không rõ (BIN '+bin+')', svc: svc && svc.v};
+          val = `Ngân hàng: <b>${esc(vietqr.bank)}</b> (BIN ${esc(bin||'—')})<br>${svc&&svc.v==='QRIBFTTC'?'Số thẻ':'Số tài khoản'}: <b>${esc(acc||'—')}</b><br>Dịch vụ: ${esc(svc?svc.v:'—')}${svc?(svc.v==='QRIBFTTA'?' (chuyển nhanh đến tài khoản)':svc.v==='QRIBFTTC'?' (chuyển nhanh đến thẻ)':svc.v==='QRPUSH'?' (thanh toán QR)':''):''}`;
+          if (!bin || !acc){ out.issues.push({lvl:'bad',t:'VietQR thiếu BIN ngân hàng hoặc số tài khoản.'}); bad=true; }
+        } else val = sub.out.map(s=>`${s.id}: ${esc(s.v)}`).join('<br>');
+      }
+    } else if (x.id==='01'){ note = x.v==='11'?'QR tĩnh (dùng nhiều lần)':x.v==='12'?'QR động (dùng một lần)':'giá trị lạ'; if (!/^1[12]$/.test(x.v)){ out.issues.push({lvl:'bad',t:'Trường 01 chỉ được là 11 hoặc 12.'}); bad=true; } }
+    else if (x.id==='53') note = CUR[x.v] || 'mã ISO 4217 lạ';
+    else if (x.id==='54'){ note = /^\d+(\.\d+)?$/.test(x.v) ? (+x.v).toLocaleString('vi-VN') : 'định dạng số tiền sai'; if (!/^\d+(\.\d+)?$/.test(x.v)){ out.issues.push({lvl:'bad',t:'Số tiền (54) sai định dạng.'}); bad=true; } }
+    else if (x.id==='62'){ const sub=parseTLV(x.v); if (sub.ok) val = sub.out.map(s=>`${esc(EMV62[s.id]||s.id)}: <b>${esc(s.v)}</b>`).join('<br>'); }
+    rows.push([x.id, name, val, note]);
+  }
+  if (get('01') && get('01').v==='12' && !get('54')) out.issues.push({lvl:'warn',t:'QR động (12) nhưng không có số tiền (54).'});
+  if (get('58') && get('58').v!=='VN' && vietqr) out.issues.push({lvl:'warn',t:`Mã quốc gia ${get('58').v}, VietQR phải là VN.`});
+  if (vietqr && get('53') && get('53').v!=='704') out.issues.push({lvl:'warn',t:'VietQR phải dùng loại tiền 704 (VND).'});
+  out.cls = bad ? 'bad' : out.issues.some(x=>x.lvl==='warn') ? 'warn' : 'ok';
+  out.pill = vietqr ? 'VietQR' : 'EMVCo QR';
+  out.head = (bad ? 'Mã QR thanh toán lỗi' : 'Mã QR thanh toán hợp lệ') + (vietqr ? ` · ${vietqr.bank} · ${vietqr.acc||''}` : '');
+  out.secs.push({title:'Các trường EMVCo', html: tableHTML(['Tag','Ý nghĩa','Giá trị','Ghi chú'], rows, true)});
+}
+
+/* ======================================================================
+   ISO/IEC 15434 envelope (UDI, IFA/securPharm PPN, ASC MH10 DI, MaxiCode)
+   ====================================================================== */
+const DI = {
+  'P':'Mã hàng của khách','1P':'Mã hàng của nhà cung cấp','2P':'Phiên bản (revision)','8P':'GTIN','30P':'Mã hàng (dạng khác)',
+  'Q':'Số lượng','S':'Số serial','1S':'Số serial bổ sung','25S':'UII (định danh duy nhất)','3S':'Mã kiện hàng','4S':'Mã kiện (bao bì)',
+  'T':'Mã truy xuất','1T':'Số lô','D':'Ngày (YYMMDD, IFA: hạn dùng)','6D':'Ngày (YYYYMMDD)','14D':'Hạn dùng (YYYYMMDD)','16D':'Ngày sản xuất (YYYYMMDD)','10D':'Mã ngày (YYWW)',
+  '9N':'PPN (mã dược phẩm, IFA)','4L':'Nước xuất xứ','V':'Mã nhà cung cấp','12V':'DUNS nhà sản xuất','18V':'Mã tổ chức (IAC+CIN)','J':'Biển số kiện (license plate)','1J':'Biển số đơn vị vận tải','K':'Số đơn hàng','2L':'Địa điểm','7Q':'Số lượng kèm đơn vị đo','20P':'Mã hàng theo nhóm','N':'Mã ngành'
+};
+function ppnOk(v){ if (v.length<4) return false; const body=v.slice(0,-2); let s=0; for (let i=0;i<body.length;i++) s += body.charCodeAt(i)*(i+2); return String(s%97).padStart(2,'0')===v.slice(-2); }
+function analyze15434(t, out){
+  let bad=false;
+  const hasTrailer = t.endsWith('\x1e\x04');
+  if (!hasTrailer){ out.issues.push({lvl:'warn',t:'Thiếu phần kết thúc RS EOT (ASCII 30 + 4) theo ISO/IEC 15434.'}); }
+  const body = t.slice(4, hasTrailer ? -2 : undefined).replace(/\x04$/,'');
+  const envs = body.split('\x1e').filter(Boolean);
+  const FMTN = {'01':'Vận chuyển (MaxiCode/UPS)','02':'EDI hoàn chỉnh','03':'ANSI X12','04':'UN/EDIFACT','05':'GS1 AI','06':'ASC MH10 Data Identifier','07':'Văn bản tự do','08':'CII','09':'Dữ liệu nhị phân','12':'Text Element Identifier (TEI)'};
+  const fmtList=[];
+  for (const env of envs){
+    const parts = env.split('\x1d'); const fmt = parts[0].slice(0,2); fmtList.push(fmt);
+    if (fmt==='05'){
+      const es = parts.slice(1).join('\x1d');
+      out.gs1 = parseGS1(es); out.gs1title = 'Phân tích AI (bao thư 05: GS1)';
+      out.gs1.fields.forEach(f=>{ f.notes = f.notes.filter(n=>!n.startsWith('Có GS phía sau')); }); // GS after every element is normal in a 15434 envelope
+    } else if (fmt==='06'){
+      const rows=[];
+      for (const el of parts.slice(1)){
+        if (!el) continue;
+        const m = /^(\d{0,3}[A-Z])(.*)$/s.exec(el);
+        if (!m){ rows.push(['?','Không nhận ra DI',rawHTML(el),'<span class="st bad">Lỗi</span>']); bad=true; continue; }
+        const [_, di, v] = m; let st='ok', note='';
+        if (di==='9N'){ st = ppnOk(v)?'ok':'bad'; note = st==='ok' ? `PPN đúng số kiểm tra. PZN: ${v.slice(2,-2)}` : 'Sai số kiểm tra PPN.'; }
+        if (di==='8P'){ st = mod10ok(v)&&v.length===14?'ok':'bad'; note = st==='ok'?'GTIN đúng':'GTIN sai'; }
+        if (di==='D'){ st = /^\d{6}$/.test(v)&&dateOk(v)?'ok':'bad'; note = st==='ok'?fmtDate6(v):'Ngày sai (YYMMDD)'; }
+        if (/^(6|14|16)D$/.test(di)){ st = /^\d{8}$/.test(v)&&date8Ok(v)?'ok':'bad'; note = st==='ok'?`${v.slice(6)}/${v.slice(4,6)}/${v.slice(0,4)}`:'Ngày sai (YYYYMMDD)'; }
+        if (st==='bad') bad=true;
+        rows.push([esc(di), esc(DI[di]||'DI không có trong danh mục rút gọn'), rawHTML(v), `<span class="st ${st}">${st==='ok'?'OK':'Lỗi'}</span>${note?`<span class="note">${esc(note)}</span>`:''}`]);
+      }
+      out.secs.push({title:'Bao thư 06: các trường Data Identifier', html: tableHTML(['DI','Ý nghĩa','Giá trị','Kết quả'], rows)});
+      if (parts.slice(1).some(e=>/^9N/.test(e))) out.pill='IFA / PPN';
+    } else {
+      out.secs.push({title:`Bao thư ${fmt}: ${FMTN[fmt]||'định dạng khác'}`, html:`<div class="raw">${rawHTML(parts.slice(1).join('\x1d'))}</div>`});
+    }
+  }
+  out.issues.unshift({lvl:'ok',t:`Có tiêu đề ISO/IEC 15434 “[)>RS”. Định dạng: ${fmtList.map(f=>f+' ('+(FMTN[f]||'?')+')').join(', ')||'—'}.`});
+  if (out.gs1) bad = bad || gs1Verdict(out.gs1)==='bad';
+  out.cls = bad?'bad':out.issues.some(x=>x.lvl==='warn')?'warn':'ok';
+  out.pill = out.pill || 'ISO/IEC 15434';
+  out.head = bad ? 'Dữ liệu ISO/IEC 15434 có lỗi' : 'Dữ liệu ISO/IEC 15434 hợp lệ';
+}
+
+/* ======================================================================
+   HIBC (Health Industry Bar Code)
+   ====================================================================== */
+const C43 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%';
+function analyzeHIBC(t, out){
+  const body=t.slice(0,-1), c=t.slice(-1);
+  let sum=0, ok=true; for (const ch of body){ const k=C43.indexOf(ch); if (k<0){ ok=false; break; } sum+=k; }
+  const want = C43[sum%43];
+  const cdOk = ok && want===c;
+  out.issues.push(cdOk ? {lvl:'ok',t:`Ký tự kiểm tra mod 43 đúng (${c}).`} : {lvl:'bad',t:ok?`Sai ký tự kiểm tra: “${c}”, đúng phải là “${want}”.`:'Có ký tự ngoài bộ Code 39 nên không tính được ký tự kiểm tra.'});
+  const rows=[];
+  const parts = body.slice(1).split('/');
+  if (parts[0][0]!=='$'){
+    const m = /^([A-Z][A-Z0-9]{3})([A-Z0-9]{1,18})(\d)$/.exec(parts[0]);
+    if (m){ rows.push(['LIC','Mã nhà sản xuất (Labeler ID)',esc(m[1])],['PCN','Mã sản phẩm',esc(m[2])],['U','Đơn vị đóng gói',esc(m[3])]); }
+    else { rows.push(['?','Phần chính',esc(parts[0])]); out.issues.push({lvl:'bad',t:'Phần chính phải có dạng LIC (4 ký tự, bắt đầu bằng chữ) + mã sản phẩm + 1 số đơn vị.'}); ok=false; }
+    if (parts[1]) rows.push(['2nd','Phần phụ (hạn dùng / lô / serial)',esc(parts.slice(1).join('/'))]);
+  } else rows.push(['2nd','Phần phụ (hạn dùng / lô / serial, mã riêng)',esc(parts.join('/'))]);
+  out.secs.push({title:'Thành phần HIBC', html: tableHTML(['Phần','Ý nghĩa','Giá trị'], rows, true)});
+  out.cls = cdOk&&ok ? 'ok' : 'bad'; out.pill='HIBC'; out.head = cdOk&&ok ? 'Mã HIBC (y tế) hợp lệ' : 'Mã HIBC có lỗi';
+}
+
+/* ======================================================================
+   Other content types (URL, Wi-Fi, vCard, CCCD, …)
+   ====================================================================== */
+function unesc(s){ return s.replace(/\\([\\;,:"])/g,'$1'); }
+function analyzeOther(t, out){
+  const kv = (k,v)=>[esc(k), v==null?'—':esc(v)];
+  let m;
+  if (/^https?:\/\//i.test(t)){
+    let u=null; try { u=new URL(t); } catch {}
+    out.pill='URL'; out.head = u ? `Đường dẫn web · ${u.host}` : 'Đường dẫn web (sai cú pháp)';
+    out.issues.push(u ? {lvl: u.protocol==='https:'?'ok':'warn', t: u.protocol==='https:'?'URL dùng https.':'URL dùng http (không mã hóa).'} : {lvl:'bad',t:'URL không hợp lệ.'});
+    if (u && /[^\x20-\x7e]/.test(t)) out.issues.push({lvl:'warn',t:'URL chứa ký tự ngoài ASCII; một số đầu đọc/ứng dụng xử lý sai.'});
+    if (u && /xn--/.test(u.host)) out.issues.push({lvl:'warn',t:'Tên miền dạng punycode (xn--). Kiểm tra kỹ để tránh giả mạo.'});
+    if (u) out.secs.push({title:'Thành phần URL', html: tableHTML(['Phần','Giá trị'], [kv('Giao thức',u.protocol),kv('Tên miền',u.host),kv('Đường dẫn',decodeURIComponentSafe(u.pathname)),...[...u.searchParams].map(([a,b])=>kv('?'+a,b))], true)});
+    return;
+  }
+  if ((m=/^WIFI:(.*)$/is.exec(t))){
+    const f={}; for (const p of m[1].match(/(?:\\.|[^;])+/g)||[]){ const i=p.indexOf(':'); if (i>0) f[p.slice(0,i).toUpperCase()]=unesc(p.slice(i+1)); }
+    out.pill='Wi-Fi'; out.head=`Cấu hình Wi-Fi · ${f.S||'(không tên)'}`;
+    if (!f.S) out.issues.push({lvl:'bad',t:'Thiếu tên mạng (S:).'});
+    if (f.T && !/^(WPA|WPA2|WPA3|WEP|nopass|SAE)$/i.test(f.T)) out.issues.push({lvl:'warn',t:`Kiểu bảo mật lạ: ${f.T}.`});
+    if (!t.endsWith(';;')) out.issues.push({lvl:'warn',t:'Chuỗi Wi-Fi nên kết thúc bằng “;;”.'});
+    out.secs.push({title:'Thông tin Wi-Fi', html: tableHTML(['Trường','Giá trị'], [kv('Tên mạng (SSID)',f.S),kv('Bảo mật',f.T||'nopass'),kv('Mật khẩu',f.P),kv('Mạng ẩn',f.H||'false')], true)});
+    return;
+  }
+  if (/^BEGIN:VCARD/i.test(t)){
+    const lines = t.replace(/\r?\n[ \t]/g,'').split(/\r?\n/);
+    const rows = lines.filter(l=>/^(FN|N|ORG|TITLE|TEL|EMAIL|ADR|URL|NOTE)[;:]/i.test(l)).map(l=>{ const i=l.indexOf(':'); return kv(l.slice(0,i).split(';')[0].toUpperCase(), unesc(l.slice(i+1))); });
+    out.pill='vCard'; out.head='Danh thiếp (vCard)';
+    if (!/END:VCARD\s*$/i.test(t)) out.issues.push({lvl:'warn',t:'Thiếu dòng END:VCARD.'});
+    out.secs.push({title:'Thông tin liên hệ', html: tableHTML(['Trường','Giá trị'], rows, true)});
+    return;
+  }
+  if (/^MECARD:/i.test(t)){
+    const rows = (t.slice(7).match(/(?:\\.|[^;])+/g)||[]).map(p=>{ const i=p.indexOf(':'); return i>0?kv(p.slice(0,i),unesc(p.slice(i+1))):null; }).filter(Boolean);
+    out.pill='MeCard'; out.head='Danh thiếp (MeCard)'; out.secs.push({title:'Thông tin liên hệ', html: tableHTML(['Trường','Giá trị'], rows, true)}); return;
+  }
+  if ((m=/^\d{12}\|(\d{9})?\|([^|]+)\|(\d{8})\|([^|]*)\|([^|]*)\|(\d{8})/.exec(t))){
+    const d = s=>`${s.slice(0,2)}/${s.slice(2,4)}/${s.slice(4)}`;
+    out.pill='CCCD'; out.head='Mã QR căn cước công dân (Việt Nam)';
+    out.issues.push({lvl:'warn',t:'Mã chứa dữ liệu cá nhân. Trang chỉ xử lý trong trình duyệt, không gửi đi.'});
+    out.secs.push({title:'Thông tin trên mã', html: tableHTML(['Trường','Giá trị'], [kv('Số CCCD',t.slice(0,12)),kv('Số CMND cũ',m[1]||''),kv('Họ tên',m[2]),kv('Ngày sinh',d(m[3])),kv('Giới tính',m[4]),kv('Nơi thường trú',m[5]),kv('Ngày cấp',d(m[6]))], true)});
+    return;
+  }
+  const simple = [
+    [/^mailto:/i,'Email','Địa chỉ email'],[/^MATMSG:/i,'Email','Email (MATMSG)'],[/^tel:/i,'Điện thoại','Số điện thoại'],[/^(smsto|sms|mms):/i,'SMS','Tin nhắn SMS'],
+    [/^geo:/i,'Vị trí','Tọa độ địa lý'],[/^BEGIN:(VEVENT|VCALENDAR)/i,'Sự kiện','Sự kiện lịch'],[/^otpauth:\/\//i,'OTP','Khóa xác thực 2 lớp (OTP)'],
+    [/^(market|itms-apps|intent):/i,'Ứng dụng','Liên kết ứng dụng'],[/^(bitcoin|ethereum|lightning):/i,'Tiền mã hóa','Địa chỉ ví tiền mã hóa'],[/^[a-z][a-z0-9+.-]{1,20}:\/\//i,'URI','Đường dẫn (URI)']
+  ];
+  for (const [re,pill,head] of simple) if (re.test(t)){ out.pill=pill; out.head=head; if (pill==='OTP') out.issues.push({lvl:'warn',t:'Mã chứa khóa bí mật 2FA. Không chia sẻ ảnh mã này.'}); return; }
+  if (/^\d+$/.test(t)){ out.pill='Số'; out.head=`Dãy số ${t.length} chữ số`; return; }
+  out.pill = 'Văn bản'; out.head = 'Văn bản tự do';
+}
+function decodeURIComponentSafe(s){ try { return decodeURIComponent(s); } catch { return s; } }
+
+/* ======================================================================
+   Symbology info
+   ====================================================================== */
+const fkey = f => String(f||'').replace(/[^a-z0-9]/gi,'').toLowerCase();
+const FMTNAME = {datamatrix:'Data Matrix',qrcode:'QR Code',microqrcode:'Micro QR',rmqrcode:'rMQR',aztec:'Aztec',aztecrune:'Aztec Rune',pdf417:'PDF417',compactpdf417:'Compact PDF417',micropdf417:'MicroPDF417',maxicode:'MaxiCode',dotcode:'DotCode',hanxin:'Han Xin',
+  code128:'Code 128',code39:'Code 39',code39ext:'Code 39 Extended',code93:'Code 93',codabar:'Codabar',itf:'ITF',itf14:'ITF-14',ean13:'EAN-13',ean8:'EAN-8',upca:'UPC-A',upce:'UPC-E',isbn:'ISBN',
+  databar:'GS1 DataBar',databaromni:'GS1 DataBar',databarstacked:'GS1 DataBar Stacked',databarexpanded:'GS1 DataBar Expanded',databarexpandedstacked:'GS1 DataBar Expanded Stacked',databarlimited:'GS1 DataBar Limited',dxfilmedge:'DX Film Edge',manual:'Nhập tay',gtin:'GTIN (nhập tay)',
+  code39std:'Code 39',code32:'Code 32 (dược phẩm Ý)',pzn:'PZN (dược phẩm Đức)',databarstk:'GS1 DataBar Stacked',databarstkomni:'GS1 DataBar Stacked Omni',databarltd:'GS1 DataBar Limited',databarexp:'GS1 DataBar Expanded',databarexpstk:'GS1 DataBar Expanded Stacked',
+  eanupc:'EAN/UPC',telepen:'Telepen',telepenalpha:'Telepen Alpha',telepennumeric:'Telepen Numeric',qrcodemodel1:'QR Code Model 1',qrcodemodel2:'QR Code',azteccode:'Aztec',otherbarcode:'Mã khác'};
+const FAMILY = k => /^(ean13|ean8|upca|upce|isbn|eanupc)$/.test(k) ? 'retail' : /^itf/.test(k) ? 'itf' : /^databar/.test(k) ? 'databar' : k;
+const SYM = {
+  ']d1':'Data Matrix thường', ']d2':'GS1 DataMatrix (FNC1 đầu)', ']d3':'Data Matrix, FNC1 vị trí 2 (AIM)', ']d4':'Data Matrix + ECI', ']d5':'GS1 DataMatrix + ECI', ']d6':'Data Matrix, FNC1 vị trí 2 + ECI',
+  ']Q0':'QR Model 1', ']Q1':'QR Code thường', ']Q2':'QR Code + ECI', ']Q3':'GS1 QR Code (FNC1 đầu)', ']Q4':'GS1 QR Code + ECI', ']Q5':'QR, FNC1 vị trí 2', ']Q6':'QR, FNC1 vị trí 2 + ECI',
+  ']z0':'Aztec thường', ']z1':'GS1 Aztec (FNC1 đầu)', ']z2':'Aztec, FNC1 vị trí 2', ']z3':'Aztec + ECI', ']z4':'GS1 Aztec + ECI', ']z5':'Aztec, FNC1 vị trí 2 + ECI', ']zC':'Aztec Rune',
+  ']C0':'Code 128 thường', ']C1':'GS1-128 (FNC1 đầu)', ']C2':'Code 128, FNC1 vị trí 2', ']C4':'ISBT 128 ghép',
+  ']E0':'EAN-13 / UPC-A / UPC-E', ']E1':'Phần phụ 2 số', ']E2':'Phần phụ 5 số', ']E3':'EAN/UPC kèm phần phụ', ']E4':'EAN-8',
+  ']e0':'GS1 DataBar', ']I0':'ITF', ']I1':'ITF (có kiểm tra số)', ']A0':'Code 39', ']A1':'Code 39 (kiểm tra mod 43)', ']A3':'Code 39 (đã kiểm tra và bỏ số kiểm tra)', ']A4':'Code 39 Full ASCII', ']A7':'Code 39 Full ASCII, đã kiểm tra',
+  ']G0':'Code 93', ']F0':'Codabar', ']F2':'Codabar (đã kiểm tra)', ']L0':'PDF417', ']L1':'PDF417 (chế độ cũ)', ']L2':'PDF417', ']U0':'MaxiCode mode 4/5/6', ']U1':'MaxiCode mode 2/3', ']U2':'MaxiCode + ECI', ']U3':'MaxiCode mode 2/3 + ECI',
+  ']J0':'DotCode', ']J1':'GS1 DotCode', ']X0':'Mã khác'
+};
+const GS1IDS = new Set([']d2',']d5',']Q3',']Q4',']C1',']e0',']z1',']z4',']J1']);
+const GS1CAP = /^(datamatrix|qrcode.*|rmqrcode|code128|aztec.*|dotcode|databar.*)$/; // symbologies that can carry GS1 element strings
+const GS1NAME = {datamatrix:'GS1 DataMatrix',qrcode:'GS1 QR Code',qrcodemodel2:'GS1 QR Code',rmqrcode:'GS1 rMQR',code128:'GS1-128',aztec:'GS1 Aztec',azteccode:'GS1 Aztec',dotcode:'GS1 DotCode'};
+
+function dmSize(ver){
   const m = /^(\d+)x(\d+)$/.exec(ver||''); if (!m) return {label:ver||'—', regions:'—'};
   const r=+m[1], c=+m[2];
   let regions='—', cross=null;
@@ -460,8 +908,16 @@ function sizeInfo(ver){
   const note = cross===true ? (r===c?'có vạch chia vùng (dấu cộng)':'có vạch chia dọc') : cross===false ? 'không có vạch chia vùng' : '';
   return {label:`${r}×${c}`, regions, note};
 }
-const SYM = {']d1':'Data Matrix thường', ']d2':'GS1 DataMatrix', ']d3':'Data Matrix, FNC1 vị trí 2 (AIM)', ']d4':'Data Matrix + ECI', ']d5':'GS1 DataMatrix + ECI', ']d6':'Data Matrix, FNC1 vị trí 2 + ECI', ']Q3':'GS1 QR Code', ']Q1':'QR Code thường', ']C1':'GS1-128', ']e0':'GS1 DataBar'};
-const GS1IDS = new Set([']d2',']d5',']Q3',']Q5',']C1',']e0',']J1']);
+const ECQR = {L:'~7%',M:'~15%',Q:'~25%',H:'~30%'};
+function sizeFact(fk, r){
+  const v = String(r.version||'');
+  if (fk==='datamatrix'){ const s=dmSize(v); return {dt:'Cỡ mã', dd:s.label, small:[s.regions,s.note].filter(x=>x&&x!=='—').join(' · ')}; }
+  if (fk==='qrcode' && /^\d+$/.test(v)){ const n=17+4*v; return {dt:'Phiên bản', dd:`V${v}`, small:`${n}×${n} module`}; }
+  if (fk==='microqrcode' && /^M?\d$/.test(v)){ const k=+v.replace('M',''); const n=9+2*k; return {dt:'Phiên bản', dd:`M${k}`, small:`${n}×${n} module`}; }
+  if (v) return {dt:'Phiên bản / cỡ', dd:v, small:fk==='aztec'?'số lớp':''};
+  if (/^(ean|upc|code|itf|codabar|databar|isbn|dx|pzn|telepen)/.test(fk)) return {dt:'Kiểu', dd:'Mã 1D', small:'mã vạch tuyến tính'};
+  return {dt:'Phiên bản / cỡ', dd:'—', small:''};
+}
 
 /* ---------- helpers ---------- */
 function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -473,11 +929,16 @@ function rawHTML(s){
     if (c===29) out+='<span class="ctl" title="Ký tự phân cách GS (ASCII 29, hex 1D)">GS</span>';
     else if (c===30) out+='<span class="ctl" title="RS (ASCII 30)">RS</span>';
     else if (c===4) out+='<span class="ctl" title="EOT (ASCII 4)">EOT</span>';
+    else if (c===10) out+='<span class="ctl" title="Xuống dòng (LF)">LF</span><br>';
+    else if (c===13) out+='<span class="ctl" title="CR">CR</span>';
     else if (c<32 || c===127) out+=`<span class="ctl">x${c.toString(16).padStart(2,'0').toUpperCase()}</span>`;
     else if (ch===' ') out+='<span style="opacity:.45">·</span>';
     else out+=esc(ch);
   }
   return out;
+}
+function tableHTML(head, rows, kv){
+  return `<div class="tbl"><table class="${kv?'kv':''}"><thead><tr>${head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td class="${i===0?'k':''}">${c==null?'':c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 function copyBtn(text, label){ const id='c'+Math.random().toString(36).slice(2); COPY[id]=text; return `<button class="copy" type="button" data-copy="${id}">${label||'Sao chép'}</button>`; }
 const COPY = {};
@@ -489,82 +950,151 @@ document.addEventListener('click', async e=>{
   setTimeout(()=>b.textContent=old,1600);
 });
 
-/* ---------- rendering ---------- */
-function renderCode(r, i, n){
+/* ======================================================================
+   Analysis: result → verdict model
+   ====================================================================== */
+function analyze(r){
   const sid = r.symbologyIdentifier || '';
   const text = r.text || '';
-  const isGS1 = GS1IDS.has(sid) || r.contentType==='GS1';
-  const size = r.format==='DataMatrix' ? sizeInfo(r.version) : {label:r.version||'—',regions:'',note:''};
-  let cls, pill, head, body='';
-  const issues=[];
-  let parsed=null, suggestion=null, suggestFrom='';
+  const fk = fkey(r.format);
+  const fam = FAMILY(fk);
+  const fname = FMTNAME[fk] || r.format || '—';
+  const out = {cls:'info', pill:'', head:'', issues:[], secs:[], gs1:null, gs1title:'', gs1hint:false, gs1es:null, fk, fname, sid};
+  const isGS1 = GS1IDS.has(sid) || r.contentType==='GS1' || r.forceGS1;
 
-  if (isGS1){
-    parsed = parseGS1(text);
-    const bad = parsed.fields.some(f=>f.st==='bad') || parsed.issues.some(x=>x.lvl==='bad');
-    const warn = parsed.issues.some(x=>x.lvl==='warn');
-    cls = bad?'bad':warn?'warn':'ok';
-    pill = bad?'Lỗi dữ liệu':warn?'Cần xem lại':'Đạt';
-    head = bad?`${SYM[sid]||'GS1'}: có lỗi cú pháp`:`${SYM[sid]||'GS1'} hợp lệ`;
-    issues.push({lvl:'ok',t:`Mã bắt đầu bằng FNC1, đầu đọc trả về ${sid||'GS1'}.`});
-    issues.push(...parsed.issues);
-  } else {
+  // 1. EAN / UPC / ITF / bare GTIN (retail linear codes)
+  if (fam==='retail' || fam==='itf' || fk==='gtin'){
+    const L = text.replace(/\s/g,'').length;
+    analyzeRetail(fam==='itf' ? 'itf' : /^(isbn|eanupc)$/.test(fk) ? ({8:'ean8',12:'upca',13:'ean13'}[L] || 'gtin') : fk, text, out);
+  }
+  // 2. GS1 element string (DataMatrix ]d2, QR ]Q3, GS1-128 ]C1, DataBar, Aztec, DotCode…)
+  else if (isGS1){
+    let es = text;
+    if (fam==='databar' && /^\d{14}$/.test(es)) es = '01'+es;
+    out.gs1 = parseGS1(es);
+    out.cls = gs1Verdict(out.gs1);
+    const gname = fam==='databar' ? fname : (GS1NAME[fk] || 'GS1');
+    out.pill = out.cls==='bad'?'Lỗi dữ liệu':out.cls==='warn'?'Cần xem lại':'Đạt';
+    out.head = out.cls==='bad' ? `${gname}: có lỗi cú pháp` : `${gname} hợp lệ`;
+    out.issues.push({lvl:'ok',t: r.manual ? 'Dữ liệu được coi là GS1 (có FNC1/AIM GS1 hoặc ký tự GS).' : `Mã bắt đầu bằng FNC1, đầu đọc trả về ${sid||'GS1'}.`});
+    out.issues.push(...out.gs1.issues);
+    out.gs1title = 'Phân tích AI';
+  }
+  // 3. ISO/IEC 15434 envelope
+  else if (text.startsWith('[)>\x1e')) analyze15434(text, out);
+  // 4. EMVCo payment QR (VietQR)
+  else if (/^000201/.test(text) && /6304[0-9A-Fa-f]{4}$/.test(text)) analyzeEMV(text, out);
+  // 5. GS1 Digital Link
+  else if (parseDigitalLink(text)){
+    const dl = parseDigitalLink(text);
+    out.gs1 = parseGS1(dl.es); out.gs1title = 'Các AI trong Digital Link';
+    out.issues.push(...dl.issues, ...out.gs1.issues);
+    if (dl.extra.length) out.issues.push({lvl:'ok',t:`Tham số khác (không phải AI): ${dl.extra.map(([a,b])=>a+'='+b).join(', ')}.`});
+    const v = out.gs1.fields.some(f=>f.st==='bad') || out.issues.some(x=>x.lvl==='bad') ? 'bad' : out.issues.some(x=>x.lvl==='warn') ? 'warn' : 'ok';
+    out.cls=v; out.pill='GS1 Digital Link'; out.head = v==='bad' ? 'GS1 Digital Link có lỗi' : `GS1 Digital Link hợp lệ${fk==='qrcode'?' (QR Code)':''}`;
+    if (sid && GS1IDS.has(sid)) out.issues.push({lvl:'bad',t:'Digital Link không được mã hóa kèm FNC1.'});
+  }
+  // 6. HIBC
+  else if (/^\+[A-Z0-9$]/.test(text) && /^[0-9A-Z\-. $\/+%]+$/.test(text) && text.length>=5 && /^(code39|code128|datamatrix|qrcode|aztec|manual)/.test(fk)) analyzeHIBC(text, out);
+  // 7. Not GS1: look for typical GS1 encoding mistakes
+  else {
+    let suggestion=null, suggestFrom='';
     const zesc = toGS1FromZplEscape(text);
-    if (zesc){ suggestion = zesc.s; suggestFrom = 'zpl'; }
+    if (zesc && GS1CAP.test(fk)){ suggestion = zesc.s; suggestFrom = 'zpl'; }
     else { suggestion = toGS1FromMarkers(text); suggestFrom = suggestion!==null ? 'markers' : ''; }
     if (suggestion===null){ suggestion = toGS1FromHRI(text); if (suggestion!==null) suggestFrom='hri'; }
     if (suggestFrom==='zpl'){
-      cls='bad'; pill='Lỗi lệnh ZPL'; head=`Không phải GS1: máy in không hiểu “${zesc.esc}1” và “${zesc.esc}d029”`;
-      issues.push({lvl:'bad',t:`Mã chứa nguyên văn chuỗi escape “${zesc.esc}1…${zesc.esc}d029”. Máy in đã in các ký tự này thành chữ thay vì đổi thành FNC1 và GS. Nguyên nhân thường gặp: lệnh ^BX thiếu tham số thứ 7 (ký tự escape), hoặc chất lượng không phải 200.`});
-      issues.push({lvl:'bad',t:`Lệnh đúng phải là: ^BXN,3,200,,,,${zesc.esc} (có đủ 4 dấu phẩy trước ký tự “${zesc.esc}”). Nếu in qua BarTender hoặc driver Windows, hãy kiểm tra phần mềm có gửi nguyên lệnh ZPL xuống máy in hay không.`});
+      out.cls='bad'; out.pill='Lỗi lệnh ZPL'; out.head=`Không phải GS1: máy in không hiểu “${zesc.esc}1” và “${zesc.esc}d029”`;
+      out.issues.push({lvl:'bad',t:`Mã chứa nguyên văn chuỗi escape “${zesc.esc}1…${zesc.esc}d029”. Máy in đã in các ký tự này thành chữ thay vì đổi thành FNC1 và GS.${fk==='datamatrix'?' Nguyên nhân thường gặp: lệnh ^BX thiếu tham số thứ 7 (ký tự escape), hoặc chất lượng không phải 200.':''}`});
+      if (fk==='datamatrix') out.issues.push({lvl:'bad',t:`Lệnh đúng phải là: ^BXN,3,200,,,,${zesc.esc} (có đủ 4 dấu phẩy trước ký tự “${zesc.esc}”). Nếu in qua BarTender hoặc driver Windows, hãy kiểm tra phần mềm có gửi nguyên lệnh ZPL xuống máy in hay không.`});
     } else if (suggestFrom==='markers'){
-      cls='bad'; pill='Sai cách nhập'; head='Không phải GS1: ký hiệu FNC1/GS bị in thành chữ';
-      issues.push({lvl:'bad',t:`Dữ liệu chứa nguyên văn các ký hiệu như “[FNC1]” hoặc “[GS]”. Máy in không hiểu các ký hiệu này nên mã hóa luôn thành chữ. Vì vậy mã không bắt đầu bằng FNC1 thật, và đầu đọc trả về ${sid||'mã thường'}.`});
-      if (/\[[^\]]*\]/.test(text.replace(/\[(FNC1|GS)\]/gi,''))) issues.push({lvl:'bad',t:'Dấu ngoặc [ ] quanh giá trị cũng bị mã hóa vào mã. Phải bỏ các dấu ngoặc này.'});
+      out.cls='bad'; out.pill='Sai cách nhập'; out.head='Không phải GS1: ký hiệu FNC1/GS bị in thành chữ';
+      out.issues.push({lvl:'bad',t:`Dữ liệu chứa nguyên văn các ký hiệu như “[FNC1]” hoặc “[GS]”. Máy in không hiểu các ký hiệu này nên mã hóa luôn thành chữ. Vì vậy mã không bắt đầu bằng FNC1 thật, và đầu đọc trả về ${sid||'mã thường'}.`});
+      if (/\[[^\]]*\]/.test(text.replace(/\[(FNC1|GS)\]/gi,''))) out.issues.push({lvl:'bad',t:'Dấu ngoặc [ ] quanh giá trị cũng bị mã hóa vào mã. Phải bỏ các dấu ngoặc này.'});
     } else if (suggestFrom==='hri'){
-      cls='bad'; pill='Sai cách nhập'; head='Không phải GS1: dữ liệu có dấu ngoặc ( ) và thiếu FNC1';
-      issues.push({lvl:'bad',t:'Dữ liệu được nhập theo dạng chữ in cho người đọc “(AI)giá trị”. Dấu ngoặc không được mã hóa vào mã, và mã phải bắt đầu bằng FNC1.'});
+      out.cls='bad'; out.pill='Sai cách nhập'; out.head='Không phải GS1: dữ liệu có dấu ngoặc ( ) và thiếu FNC1';
+      out.issues.push({lvl:'bad',t:'Dữ liệu được nhập theo dạng chữ in cho người đọc “(AI)giá trị”. Dấu ngoặc không được mã hóa vào mã, và mã phải bắt đầu bằng FNC1.'});
     } else {
-      cls='info'; pill= r.format==='DataMatrix' ? 'Không phải GS1' : r.format; head = (SYM[sid] || r.format) + (r.format==='DataMatrix' ? ': dữ liệu tự do' : '');
-      issues.push({lvl:'warn',t:`Mã không bắt đầu bằng FNC1 (đầu đọc trả về ${sid||'—'}), nên hệ thống GS1 sẽ không nhận. Đây là mã hợp lệ nếu khách hàng chỉ yêu cầu Data Matrix thường.`});
-      if (/^\d{2,4}/.test(text) && lookupAI(text,0)) issues.push({lvl:'warn',t:'Dữ liệu bắt đầu giống một AI GS1. Nếu định làm mã GS1 thì đang thiếu FNC1 ở đầu.'});
+      analyzeOther(text, out);
+      out.cls = out.issues.some(x=>x.lvl==='bad') ? 'bad' : 'info';
+      if (GS1CAP.test(fk) && /^\d{2,4}/.test(text) && lookupAI(text,0) && /^(Số|Văn bản)$/.test(out.pill)){
+        const trial = parseGS1(text);
+        if (trial.fields.length && trial.fields[0].st==='ok'){
+          out.cls='warn'; out.gs1hint=true;
+          out.issues.push({lvl:'warn',t:`Dữ liệu bắt đầu giống một AI GS1 (${trial.fields[0].ai}) nhưng mã không bắt đầu bằng FNC1 (đầu đọc trả về ${sid||'—'}), nên hệ thống GS1 sẽ không nhận. Nếu định làm mã GS1 thì đang thiếu FNC1 ở đầu.`});
+          suggestion = text;
+        }
+      }
+      if (fk==='datamatrix' && !out.gs1hint){ out.issues.push({lvl:'warn',t:`Mã không bắt đầu bằng FNC1 (đầu đọc trả về ${sid||'—'}), nên không phải GS1 DataMatrix. Đây là mã hợp lệ nếu khách hàng chỉ yêu cầu Data Matrix thường.`}); }
+      if (fk==='datamatrix' && /^(Số|Văn bản)$/.test(out.pill)) out.pill = 'Không phải GS1';
+      out.pill = out.pill || fname;
+      out.head = out.head ? `${fname}: ${out.head.charAt(0).toLowerCase()+out.head.slice(1)}` : fname;
     }
-    if (suggestion!==null) parsed = parseGS1(suggestion);
-  }
-  if (size.regions && size.regions!=='—' && r.format==='DataMatrix') {
-    const len = text.length;
-    issues.push({lvl:'ok', t:`Cỡ ${size.label}, ${size.regions}${size.note?', '+size.note:''}. Nội dung dài ${len} ký tự.`});
+    if (suggestion!==null){ out.gs1 = parseGS1(suggestion); out.gs1title = 'Nếu nhập đúng, dữ liệu sẽ được hiểu như sau'; out.fixed = true; }
   }
 
-  body += `<div class="verdict ${cls}"><span class="pill">${esc(pill)}</span><h2>${esc(head)}</h2>${n>1?`<span class="idx">Mã ${i+1}/${n}</span>`:''}</div>`;
+  // generic symbol checks
+  if (fk==='code39' && text.length>1 && !out.secs.length && out.pill!=='HIBC'){
+    const body=text.slice(0,-1); let s=0, ok=true; for (const ch of body){ const k=C43.indexOf(ch); if (k<0){ok=false;break;} s+=k; }
+    if (ok) out.issues.push({lvl:'ok',t: C43[s%43]===text.slice(-1) ? `Ký tự cuối “${text.slice(-1)}” khớp số kiểm tra mod 43 (nếu mã có dùng).` : 'Ký tự cuối không phải số kiểm tra mod 43 (bình thường nếu mã không dùng số kiểm tra).'});
+  }
+  if (fk==='pzn'){ const d=text.replace(/\D/g,''); if (d.length===8){ let s=0; for (let i=0;i<7;i++) s+=(+d[i])*(i+1); const ok = s%11===+d[7]; out.issues.push(ok?{lvl:'ok',t:'Số kiểm tra PZN (mod 11) đúng.'}:{lvl:'bad',t:'Sai số kiểm tra PZN (mod 11).'}); if (!ok) out.cls='bad'; } }
+  if (r.contentType==='Binary') out.issues.push({lvl:'warn',t:'Nội dung là dữ liệu nhị phân, không phải văn bản.'});
+  if (r.hasECI) out.issues.push({lvl:'ok',t:'Mã có khai báo ECI (bảng mã ký tự).'});
+  if (r.readerInit) out.issues.push({lvl:'warn',t:'Mã có cờ Reader Initialisation: đây là mã cấu hình đầu đọc, không phải dữ liệu thường.'});
+  if (r.isMirrored) out.issues.push({lvl:'warn',t:'Mã bị lật gương (in ngược chiều). Nhiều đầu đọc sẽ không đọc được.'});
+  if (r.isInverted) out.issues.push({lvl:'warn',t:'Mã in ngược màu (sáng trên nền tối). Một số đầu đọc không đọc được; GS1 khuyến nghị in tối trên nền sáng.'});
+  if (r.sequenceSize>1) out.issues.push({lvl:'ok',t:`Mã thuộc chuỗi ghép (Structured Append): phần ${r.sequenceIndex+1}/${r.sequenceSize}. Cần đọc đủ các phần để có dữ liệu hoàn chỉnh.`});
+  if (fk==='datamatrix'){ const s=dmSize(r.version); if (s.regions!=='—') out.issues.push({lvl:'ok', t:`Cỡ ${s.label}, ${s.regions}${s.note?', '+s.note:''}. Nội dung dài ${text.length} ký tự.`}); }
+  if (r.ecLevel && /qr/.test(fk)) out.issues.push({lvl:'ok',t:`Mức sửa lỗi ${r.ecLevel}${ECQR[r.ecLevel]?' (khôi phục được '+ECQR[r.ecLevel]+' mã bị hỏng)':''}.`});
+  if (!out.pill) out.pill = fname;
+  if (!out.head) out.head = fname;
+  return out;
+}
+
+/* ---------- rendering ---------- */
+function renderCode(r, i, n, a){
+  const text = r.text || '';
+  const sid = a.sid, fk = a.fk;
+  const isGS1 = GS1IDS.has(sid) || r.contentType==='GS1';
+  const sz = sizeFact(fk, r);
+  let body='';
+  body += `<div class="verdict ${a.cls}"><span class="pill">${esc(a.pill)}</span><h2>${esc(a.head)}</h2>${n>1?`<span class="idx">Mã ${i+1}/${n}</span>`:''}</div>`;
   body += `<dl class="facts" style="margin:0">
-    <div class="fact"><dt>Loại mã</dt><dd>${esc(r.format)}<small>${esc(SYM[sid]||'')}</small></dd></div>
-    <div class="fact"><dt>Symbology ID</dt><dd>${esc(sid||'—')}<small>${isGS1?'có FNC1 đầu':'không có FNC1 đầu'}</small></dd></div>
-    <div class="fact"><dt>Cỡ mã</dt><dd>${esc(size.label)}<small>${esc(size.regions||'')}${size.note?' · '+esc(size.note):''}</small></dd></div>
-    <div class="fact"><dt>Độ dài dữ liệu</dt><dd>${text.length}<small>ký tự sau giải mã</small></dd></div>
+    <div class="fact"><dt>Loại mã</dt><dd>${esc(a.fname)}<small>${esc(r.manual?'dữ liệu nhập tay':(SYM[sid]||''))}</small></dd></div>
+    <div class="fact"><dt>Symbology ID</dt><dd>${esc(sid||'—')}<small>${isGS1?'có FNC1 đầu (GS1)':sid?'không phải GS1':'không rõ'}</small></dd></div>
+    <div class="fact"><dt>${esc(sz.dt)}</dt><dd>${esc(sz.dd)}<small>${esc(sz.small||'')}</small></dd></div>
+    ${r.ecLevel?`<div class="fact"><dt>Mức sửa lỗi</dt><dd>${esc(r.ecLevel)}<small>${esc(ECQR[r.ecLevel]||'')}</small></dd></div>`:''}
+    <div class="fact"><dt>Độ dài dữ liệu</dt><dd>${[...text].length}<small>ký tự sau giải mã</small></dd></div>
   </dl>`;
-  body += `<div class="sec"><h3>Kiểm tra</h3><ul class="issues">${issues.map(x=>`<li class="${x.lvl}">${esc(x.t)}</li>`).join('')}</ul></div>`;
+  body += `<div class="sec"><h3>Kiểm tra</h3><ul class="issues">${a.issues.map(x=>`<li class="${x.lvl}">${esc(x.t)}</li>`).join('')}</ul></div>`;
   body += `<div class="sec"><h3>Dữ liệu gốc đọc được ${copyBtn(text)}</h3><div class="raw">${rawHTML(text)||'<i>(trống)</i>'}</div></div>`;
+  if (r.contentType==='Binary' && r.bytes){ const hex=[...r.bytes].map(b=>b.toString(16).padStart(2,'0')).join(' '); body += `<div class="sec"><h3>Dữ liệu dạng hex ${copyBtn(hex)}</h3><div class="raw">${esc(hex)}</div></div>`; }
+  for (const s of a.secs) body += `<div class="sec"><h3>${esc(s.title)}</h3>${s.html}</div>`;
 
+  const parsed = a.gs1;
   if (parsed){
-    const title = isGS1 ? 'Phân tích AI' : 'Nếu nhập đúng, dữ liệu sẽ được hiểu như sau';
-    body += `<div class="sec"><h3>${title}</h3><div class="tbl"><table>
+    body += `<div class="sec"><h3>${esc(a.gs1title)}</h3><div class="tbl"><table>
       <thead><tr><th>AI</th><th>Ý nghĩa</th><th>Giá trị</th><th>Định dạng</th><th>Kết quả</th></tr></thead><tbody>
       ${parsed.fields.map(f=>`<tr><td class="ai">(${esc(f.ai)})</td><td>${esc(f.name)}</td><td class="val">${rawHTML(f.value)}</td><td class="fmt">${esc(f.spec)}</td>
-      <td><span class="st ${f.st==='bad'?'bad':f.notes.length&&f.st!=='ok'?'warn':'ok'}">${f.st==='bad'?'Lỗi':'OK'}</span>${f.notes.map(x=>`<span class="note">${esc(x)}</span>`).join('')}</td></tr>`).join('')}
+      <td><span class="st ${f.st==='bad'?'bad':'ok'}">${f.st==='bad'?'Lỗi':'OK'}</span>${f.notes.map(x=>`<span class="note">${esc(x)}</span>`).join('')}</td></tr>`).join('')}
       </tbody></table></div>
-      ${!isGS1 && parsed.issues.length ? `<ul class="issues">${parsed.issues.map(x=>`<li class="${x.lvl}">${esc(x.t)}</li>`).join('')}</ul>`:''}
+      ${a.fixed && parsed.issues.length ? `<ul class="issues">${parsed.issues.map(x=>`<li class="${x.lvl}">${esc(x.t)}</li>`).join('')}</ul>`:''}
     </div>`;
-    const good = parsed.fields.filter(f=>f.ai!=='?');
-    if (good.length){
-      body += `<div class="sec"><h3>Dòng chữ in cho người đọc (HRI) ${copyBtn(hriText(parsed.fields))}</h3><div class="hri">${hriOf(parsed.fields)}</div></div>`;
-      body += `<div class="sec"><h3>${isGS1?'ZPL Zebra tương ứng':'ZPL Zebra đã sửa'} ${copyBtn(zplOf(parsed.fields))}</h3><pre class="zpl">${esc(zplOf(parsed.fields))}</pre></div>`;
-    }
+  }
+  const fields = parsed ? parsed.fields : a.gs1es ? parseGS1(a.gs1es).fields : null;
+  const good = fields ? fields.filter(f=>f.ai!=='?') : [];
+  if (good.length){
+    body += `<div class="sec"><h3>Dòng chữ in cho người đọc (HRI) ${copyBtn(hriText(fields))}</h3><div class="hri">${hriOf(fields)}</div></div>`;
+    const dl = digitalLinkOf(fields);
+    if (dl && a.pill!=='GS1 Digital Link') body += `<div class="sec"><h3>GS1 Digital Link tương ứng (in trên QR) ${copyBtn(dl)}</h3><div class="raw">${esc(dl)}</div></div>`;
+    if (fk==='datamatrix' || (r.manual && !a.gs1es)) body += `<div class="sec"><h3>${isGS1&&!a.fixed?'ZPL Zebra tương ứng (GS1 DataMatrix)':'ZPL Zebra đã sửa (GS1 DataMatrix)'} ${copyBtn(zplOf(fields))}</h3><pre class="zpl">${esc(zplOf(fields))}</pre></div>`;
   }
   const el = document.createElement('article'); el.className='card'; el.innerHTML = body; return el;
 }
 
-function drawImage(img, results){
+const COL = {ok:'#1B7F4B', warn:'#D0741A', bad:'#B42B2B', info:'#1D4E89'};
+function drawImage(img, results, models){
   const cv = $('#cv'); const ctx = cv.getContext('2d');
   cv.width = img.width; cv.height = img.height;
   ctx.drawImage(img,0,0);
@@ -572,7 +1102,7 @@ function drawImage(img, results){
   results.forEach((r,i)=>{
     const p = r.position; if (!p) return;
     ctx.beginPath(); ctx.moveTo(p.topLeft.x,p.topLeft.y); ctx.lineTo(p.topRight.x,p.topRight.y); ctx.lineTo(p.bottomRight.x,p.bottomRight.y); ctx.lineTo(p.bottomLeft.x,p.bottomLeft.y); ctx.closePath();
-    const col = GS1IDS.has(r.symbologyIdentifier) ? '#1B7F4B' : '#D0741A';
+    const col = COL[models[i].cls] || COL.info;
     ctx.lineWidth = lw; ctx.strokeStyle = col; ctx.stroke();
     if (results.length>1){ const fs=Math.max(14,lw*6); ctx.font=`600 ${fs}px sans-serif`; ctx.fillStyle=col; ctx.fillRect(p.topLeft.x, p.topLeft.y-fs-4, fs+6, fs+4); ctx.fillStyle='#fff'; ctx.fillText(String(i+1), p.topLeft.x+4, p.topLeft.y-6); }
   });
@@ -584,6 +1114,14 @@ async function loadImage(src){
   const im = new Image(); im.src = src; await im.decode(); return im;
 }
 
+function showResults(results){
+  const box = $('#codes'); box.innerHTML='';
+  const models = results.map(analyze);
+  results.forEach((r,i)=>box.appendChild(renderCode(r,i,results.length,models[i])));
+  return models;
+}
+
+const READ_OPTS = {tryHarder:true, tryRotate:true, tryInvert:true, tryDownscale:true, maxNumberOfSymbols:8, textMode:'Plain'};
 async function processSource(src, label){
   if (!ready){ queue = [src,label]; return; }
   statusEl.textContent = 'Đang giải mã…';
@@ -596,22 +1134,23 @@ async function processSource(src, label){
     const c = document.createElement('canvas'); c.width = Math.round(img.width*scale); c.height = Math.round(img.height*scale);
     const cx = c.getContext('2d'); cx.imageSmoothingEnabled = scale < 1; cx.imageSmoothingQuality = 'high'; cx.fillStyle='#fff'; cx.fillRect(0,0,c.width,c.height); cx.drawImage(img,0,0,c.width,c.height);
     const data = cx.getImageData(0,0,c.width,c.height);
-    let results = await ZXingWASM.readBarcodes(data, {tryHarder:true, tryRotate:true, tryInvert:true, tryDownscale:true, maxNumberOfSymbols:8, textMode:'Plain'});
+    let results = await ZXingWASM.readBarcodes(data, READ_OPTS);
     results = results.filter(r=>r.isValid);
     if (scale!==1) results.forEach(r=>{ for (const k of ['topLeft','topRight','bottomRight','bottomLeft']) { r.position[k].x/=scale; r.position[k].y/=scale; } });
-    $('#result').hidden = false;
-    drawImage(img, results);
+    $('#result').hidden = false; $('#result').classList.remove('noimg');
     $('#imgmeta').textContent = `${label} · ${img.width}×${img.height}px`;
-    const box = $('#codes'); box.innerHTML='';
     if (!results.length){
-      box.innerHTML = `<div class="empty"><h2>Không tìm thấy mã trong ảnh</h2><ul>
+      drawImage(img, [], []);
+      $('#codes').innerHTML = `<div class="empty"><h2>Không tìm thấy mã trong ảnh</h2><ul>
         <li>Chụp thẳng, đủ sáng, không lóa. Mã nên chiếm phần lớn khung hình.</li>
-        <li>Chừa khoảng trắng (quiet zone) quanh mã, tối thiểu 1 module.</li>
+        <li>Chừa khoảng trắng (quiet zone) quanh mã: tối thiểu 1 module với mã 2D, khoảng 10 lần vạch nhỏ nhất với mã vạch 1D.</li>
         <li>Mã khắc laser tương phản thấp: thử cắt sát vùng mã rồi dán lại.</li>
-        <li>Ảnh quá nhỏ hoặc bị nén mờ: dùng ảnh gốc độ phân giải cao hơn.</li></ul></div>`;
+        <li>Ảnh quá nhỏ hoặc bị nén mờ: dùng ảnh gốc độ phân giải cao hơn.</li>
+        <li>Có sẵn chuỗi dữ liệu? Dùng mục “Nhập hoặc dán dữ liệu đã quét”.</li></ul></div>`;
       statusEl.textContent = 'Không đọc được mã.';
     } else {
-      results.forEach((r,i)=>box.appendChild(renderCode(r,i,results.length)));
+      const models = showResults(results);
+      drawImage(img, results, models);
       statusEl.textContent = `Đã đọc ${results.length} mã.`;
     }
   } catch(err){
@@ -619,10 +1158,56 @@ async function processSource(src, label){
   } finally { $('#result').classList.remove('loading'); }
 }
 
+/* ---------- manual / scanner-keyboard input ---------- */
+const AIM_FMT = {d:'DataMatrix',Q:'QRCode',z:'Aztec',C:'Code128',e:'DataBar',I:'ITF',A:'Code39',G:'Code93',F:'Codabar',L:'PDF417',U:'MaxiCode',J:'DotCode'};
+function manualResult(raw){
+  let t = raw.replace(/\r?\n$/,'');
+  let sid = '', fnc1 = false;
+  const aim = /^\](([A-Za-z])[0-9A-Za-z])/.exec(t);
+  if (aim){ sid = ']'+aim[1]; t = t.slice(3); }
+  // literal escape tokens typed by people / emitted by scanner software
+  t = t.replace(/\\x1d|\\u001d|\\x1D|\\u001D|␝/g,'\x1d').replace(/\\x1e|\\u001e|␞/gi,'\x1e').replace(/\\x04|\\u0004|␄/gi,'\x04');
+  t = t.replace(/<RS>|\[RS\]|\{RS\}/gi,'\x1e').replace(/<EOT>|\[EOT\]|\{EOT\}/gi,'\x04');
+  if (/^(\[FNC1\]|<FNC1>|\{FNC1\})/i.test(t)){ fnc1 = true; t = t.replace(/^(\[FNC1\]|<FNC1>|\{FNC1\})/i,''); }
+  t = t.replace(/\[(GS|FNC1)\]|<(GS|FNC1)>|\{(GS|FNC1)\}/gi,'\x1d');
+  let hri = false;
+  if (/^\(\d{2,4}\)/.test(t)){ const es = toGS1FromHRI(t); if (es){ t = es; hri = true; fnc1 = true; } }
+  let format = 'Manual';
+  if (sid){
+    const L = sid[1];
+    if (L==='E') format = sid===']E4' ? 'EAN8' : t.length===12 ? 'UPCA' : t.length===8 ? 'UPCE' : 'EAN13';
+    else format = AIM_FMT[L] || 'Manual';
+  } else if (/^\d{8}$|^\d{12,14}$/.test(t)) format = 'GTIN';
+  const looksGS1 = !sid && (t.includes('\x1d') && !t.startsWith('[)>')) && !!lookupAI(t,0);
+  return {format, symbologyIdentifier: sid, text: t, contentType: (fnc1 || looksGS1) ? 'GS1' : 'Text', manual:true, forceGS1: fnc1 || looksGS1, version:'', hri};
+}
+function runManual(){
+  const raw = $('#mtext').value; if (!raw.trim()) return;
+  const r = manualResult(raw);
+  $('#result').hidden = false; $('#result').classList.add('noimg');
+  const models = showResults([r]);
+  if (r.hri) $('#codes .issues').insertAdjacentHTML('afterbegin','<li class="ok">Đã chuyển từ dạng HRI (AI trong ngoặc) sang chuỗi GS1 có FNC1/GS.</li>');
+  statusEl.textContent = 'Đã kiểm tra dữ liệu nhập tay.';
+  $('#result').scrollIntoView({behavior:'smooth', block:'start'});
+  return models;
+}
+$('#mgo').addEventListener('click', runManual);
+$('#mtext').addEventListener('keydown', e=>{
+  if (e.ctrlKey && (e.key===']' || e.code==='BracketRight')){   // Ctrl+] = GS from keyboard-wedge scanners
+    e.preventDefault(); const ta=e.target, s=ta.selectionStart; ta.setRangeText('<GS>', s, ta.selectionEnd, 'end');
+  } else if (e.key==='Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); runManual(); }
+});
+window.QRCheck = {analyze, manualResult, parseGS1, parseDigitalLink, crc16};
+
 /* ---------- input wiring ---------- */
 document.addEventListener('paste', e=>{
+  if (e.target && e.target.id==='mtext') return;
   const items = [...(e.clipboardData?.items||[])].filter(it=>it.type.startsWith('image/'));
-  if (!items.length){ statusEl.textContent='Clipboard không có ảnh. Hãy chụp màn hình hoặc sao chép ảnh rồi dán lại.'; return; }
+  if (!items.length){
+    const txt = e.clipboardData?.getData('text');
+    if (txt && txt.trim()){ e.preventDefault(); $('#manual').open = true; $('#mtext').value = txt; runManual(); return; }
+    statusEl.textContent='Clipboard không có ảnh. Hãy chụp màn hình hoặc sao chép ảnh rồi dán lại.'; return;
+  }
   e.preventDefault(); processSource(items[0].getAsFile(), 'Ảnh dán từ clipboard');
 });
 const drop = $('#drop');
